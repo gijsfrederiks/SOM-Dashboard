@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="nl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Zwartewaterland Omgevingsanalyse</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet (Kaart) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Lettertype -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Dashboard%20Omgevingsanalyse%22%2C%22short_name%22%3A%22SOM%20Dash%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f9fafb%22%2C%22theme_color%22%3A%22%23002f5d%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzAwMmY1ZCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZvbnQtc2l6ZT0iMjAwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlogPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%20512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Zwartewaterland Website Kleuren
+                        zwlDarkBlue: '#002f5d',
+                        zwlLightBlue: '#0097d8',
+                        zwlGreen: '#9dc221',
+                        
+                        // Overschrijf de UI kleuren naar het ZWL palet
+                        somBlue: '#0097d8',       // Cyaan/Lichtblauw voor accenten
+                        somDarkBlue: '#002f5d',   // Diepblauw voor koppen en balken
+                        
+                        // Matrix / Status kleuren
+                        somOrange: '#F97316',
+                        somGreen: '#10B981',
+                        somRed: '#EF4444',
+                        somYellow: '#F59E0B',
+                        somTeal: '#14B8A6',
+                        
+                        darkBg: '#111827',
+                        darkCard: '#1F2937',
+                        appGray: '#F3F4F6',
+                        appDarkBorder: '#374151'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    },
+                    screens: {
+                        'print': {'raw': 'print'},
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.2s ease-out',
+                        'modal-pop': 'modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        modalPop: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles */
+        body { transition: background-color 0.3s, color 0.3s; overflow: hidden; }
+        
+        /* App Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* General UI Elements */
+        .sticky-textarea { font-family: 'Inter', sans-serif; font-size: 0.95rem; background: transparent; border: none; resize: none; width: 100%; height: 100%; line-height: 1.5; }
+        .sticky-textarea:focus { outline: none; box-shadow: none; }
+        .shared-sh-list { list-style: none; padding: 0; margin: 0; }
+        .shared-sh-list li { font-size: 0.9rem; padding: 2px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+        
+        /* Matrix */
+        .matrix-cell input, .matrix-cell textarea { font-size: 0.8rem; padding: 4px; width: 100%; border: 1px solid transparent; background: transparent; margin-bottom: 2px; }
+        .matrix-cell input:focus, .matrix-cell textarea:focus { background: white; border-color: #3b82f6; border-radius: 4px; outline: none; box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2); }
+        .color-box { width: 24px; height: 24px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); transition: transform 0.1s; }
+        .color-box:hover { transform: scale(1.1); }
+
+        /* Map Styles */
+        #map-container { z-index: 1; }
+        .leaflet-popup-content-wrapper { font-family: 'Inter', sans-serif; font-size: 0.8rem; }
+
+        /* Print Replacements Styles */
+        .print-replacement { display: none; }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            @page { margin: 1cm; size: A4 portrait; }
+            @page landscape { size: A4 landscape; margin: 1cm; }
+            body { overflow: visible !important; }
+            .no-print, nav, aside, #progress-bar-container, button, .leaflet-control-zoom { display: none !important; }
+            #print-header { display: block !important; }
+            body, .dark { background-color: white !important; color: black !important; font-size: 11pt; }
+            .dark .bg-darkCard, .bg-white, .bg-gray-50 { background-color: white !important; color: black !important; box-shadow: none !important; }
+            
+            /* Unhide all sections for print */
+            .step-section { display: block !important; break-before: page; margin-bottom: 2cm; }
+            .matrix-scroll-wrapper { overflow: visible !important; }
+            
+            /* Print Specific tweaks */
+            .print-landscape table { font-size: 8pt; width: 100% !important; table-layout: fixed; }
+            .print-landscape th, .print-landscape td { padding: 2px !important; border: 1px solid #999 !important; word-wrap: break-word; white-space: normal !important; }
+            textarea, input[type="text"], input[type="date"], select { display: none !important; }
+            .print-replacement { display: block !important; width: 100%; white-space: pre-wrap; overflow-wrap: break-word; color: black !important; }
+            table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+            .color-box, .matrix-cell, span { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            #map-container { height: 300px !important; border: 1px solid #ccc; page-break-inside: avoid; }
+        }
+        #print-header { display: none; }
+    </style>
+</head>
+<body class="bg-appGray dark:bg-darkBg text-slate-800 dark:text-gray-200 font-sans flex flex-col h-screen w-full overflow-hidden">
+
+    <!-- Custom Modal Overlay -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
+        <div class="bg-white dark:bg-darkCard w-full max-w-md p-6 rounded-2xl shadow-2xl animate-modal-pop border border-gray-100 dark:border-gray-700">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900 dark:text-white mb-2">Bevestiging</h3>
+            <p id="modal-msg" class="text-gray-600 dark:text-gray-300 mb-6">Weet je zeker dat je dit wilt doen?</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors font-medium">Annuleren</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm font-medium">Bevestigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar-container" class="fixed top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-800 z-[90] print:hidden">
+        <div id="progress-bar" class="h-full bg-zwlGreen transition-all duration-500" style="width: 0%"></div>
+    </div>
+
+    <!-- App Topbar -->
+    <nav class="shrink-0 bg-zwlDarkBlue shadow-md border-b-4 border-zwlLightBlue z-50 print:hidden h-14 flex items-center justify-between px-4">
+        
+        <div class="flex items-center gap-6">
+            <!-- App Logo / Title -->
+            <div class="font-bold text-lg text-white tracking-tight flex items-center gap-2">
+                <span class="bg-white text-zwlDarkBlue w-8 h-8 rounded-lg flex items-center justify-center shadow-inner font-extrabold border-b-2 border-zwlGreen text-xs">SOM</span>
+                <span class="hidden sm:inline">Zwartewaterland Omgevingsanalyse</span>
+            </div>
+
+            <!-- Software Menu's -->
+            <div class="flex items-center space-x-1 text-sm relative">
+                <!-- Bestand Menu -->
+                <div class="relative">
+                    <button id="btn-menu-bestand" onclick="toggleDropdown('menu-bestand', event)" class="px-3 py-1.5 rounded-md hover:bg-white/20 text-white font-medium transition focus:outline-none">
+                        Bestand
+                    </button>
+                    <div id="menu-bestand" class="dropdown-content hidden absolute left-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 py-1 z-50">
+                        <button onclick="openProject(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between text-gray-700 dark:text-gray-200">
+                            <span><span class="mr-2 opacity-70">📂</span> Openen...</span> <span class="text-xs text-gray-400">Ctrl+O</span>
+                        </button>
+                        <button onclick="saveProject(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between text-gray-700 dark:text-gray-200">
+                            <span><span class="mr-2 opacity-70">💾</span> Opslaan</span> <span class="text-xs text-gray-400">Ctrl+S</span>
+                        </button>
+                        <button onclick="saveProjectAs(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
+                            <span><span class="mr-2 opacity-70">📝</span> Opslaan als...</span> <span class="text-xs text-gray-400">Ctrl+Shift+S</span>
+                        </button>
+                        <button onclick="confirmReset(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center text-red-600 dark:text-red-400 mt-1">
+                            <span class="mr-2 opacity-70">⚠️</span> Nieuw / Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Export Menu -->
+                <div class="relative">
+                    <button id="btn-menu-export" onclick="toggleDropdown('menu-export', event)" class="px-3 py-1.5 rounded-md hover:bg-white/20 text-white font-medium transition focus:outline-none">
+                        Exporteren
+                    </button>
+                    <div id="menu-export" class="dropdown-content hidden absolute left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 py-1 z-50">
+                        <button onclick="exportToWord(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center text-somBlue dark:text-blue-400 font-medium">
+                            <span class="mr-2">📄</span> Naar Word (.doc)
+                        </button>
+                        <button onclick="prepareAndPrint(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between text-gray-700 dark:text-gray-200">
+                            <span><span class="mr-2 opacity-70">🖨️</span> PDF / Printen</span> <span class="text-xs text-gray-400">Ctrl+P</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-sm">
+            <!-- Save indicator -->
+            <div id="save-indicator" class="hidden items-center text-white/90 text-xs italic mr-2 bg-white/10 px-2 py-1 rounded">
+                <span class="text-zwlGreen font-bold mr-1">*</span> Wijzigingen
+            </div>
+
+            <!-- Global Status -->
+            <select id="header_status" onchange="syncStatus('header_status')" class="bg-white/10 text-white border-none rounded-md px-3 py-1.5 cursor-pointer hover:bg-white/20 transition focus:ring-0 font-medium outline-none">
+                <option value="Concept" class="text-gray-900">Concept</option>
+                <option value="Ter review" class="text-gray-900">Ter review</option>
+                <option value="Definitief" class="text-gray-900">Definitief</option>
+            </select>
+            
+            <div class="h-5 w-px bg-white/20 mx-1"></div>
+            
+            <button onclick="toggleDarkMode()" class="p-1.5 rounded-full hover:bg-white/20 text-white transition" title="Wissel Dark Mode">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+
+            <button id="installAppBtn" onclick="installApp()" class="hidden bg-zwlGreen text-zwlDarkBlue px-3 py-1.5 rounded-md hover:bg-opacity-90 transition shadow-sm font-bold items-center whitespace-nowrap ml-1">
+                <span class="mr-1">📱</span> Install
+            </button>
+        </div>
+    </nav>
+
+    <!-- App Body (Sidebar + Content) -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white dark:bg-darkCard border-r border-gray-200 dark:border-appDarkBorder flex flex-col shrink-0 print:hidden z-10 shadow-[2px_0_8px_rgba(0,0,0,0.02)]">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Projectnaam</h3>
+                <input type="text" id="project_subtitle" class="w-full bg-appGray dark:bg-gray-800 border-none rounded px-3 py-2 text-sm text-somDarkBlue dark:text-blue-300 font-bold focus:ring-2 focus:ring-somBlue focus:outline-none placeholder-gray-400" placeholder="Naam project...">
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="sidebar-nav">
+                <!-- Tabs -->
+                <button onclick="switchTab('intro')" id="tab-intro" class="sidebar-tab w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors bg-blue-50 text-somBlue dark:bg-blue-900/30 dark:text-blue-400 border-l-4 border-somBlue">
+                    <span class="mr-2 opacity-70">ℹ️</span> Introductie
+                </button>
+                
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-5 mb-2 px-3">Analyse Stappen</h4>
+                
+                <button onclick="switchTab('step1')" id="tab-step1" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">1.</span> Opgave bepalen
+                </button>
+                <button onclick="switchTab('step2')" id="tab-step2" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">2.</span> Issues & Stakeholders
+                </button>
+                <button onclick="switchTab('step3')" id="tab-step3" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">3.</span> Vakdisciplines
+                </button>
+                <button onclick="switchTab('step4')" id="tab-step4" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">4.</span> SOM Basismatrix
+                </button>
+                <button onclick="switchTab('step5')" id="tab-step5" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">5.</span> Strategie
+                </button>
+                <button onclick="switchTab('step_contacten')" id="tab-step_contacten" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">6.</span> Contactenlijst
+                </button>
+                <button onclick="switchTab('step6')" id="tab-step6" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">7.</span> Gesprekken
+                </button>
+                <button onclick="switchTab('step7')" id="tab-step7" class="sidebar-tab w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l-4 border-transparent">
+                    <span class="mr-2 opacity-50">8.</span> Borging
+                </button>
+            </nav>
+            
+            <!-- Bottom Sidebar Info -->
+            <div class="p-4 border-t border-gray-100 dark:border-gray-800 text-xs text-gray-400 dark:text-gray-500">
+                <p id="lastSaved">Opgeslagen: -</p>
+                <p class="mt-1 opacity-60 font-bold text-zwlDarkBlue dark:text-gray-400">Gemeente Zwartewaterland / Strategisch omgevingsmanagement</p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="flex-1 overflow-y-auto relative p-4 md:p-8 scroll-smooth" id="main-scroll-area">
+            
+            <div class="max-w-7xl mx-auto pb-12">
+                <!-- Print Header (Only visible when printing) -->
+                <div id="print-header" class="border-b-2 border-somBlue mb-8 pb-4 hidden print:block">
+                    <h1 class="text-3xl font-bold text-somBlue">Zwartewaterland Omgevingsanalyse Rapportage</h1>
+                    <h2 id="print-subtitle" class="text-xl text-gray-600 mt-2"></h2>
+                    <p id="print-date" class="text-sm text-gray-400 mt-1"></p>
+                </div>
+
+                <!-- SECTIE: INTRODUCTIE -->
+                <section id="sect_intro" class="step-section block animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="flex items-center mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+                                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center text-2xl mr-4 shadow-sm text-somBlue">ℹ️</div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-somBlue dark:text-blue-400">Doel & Achtergrond</h2>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Welkom in het dashboard omgevingsanalyse.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-6 text-gray-700 dark:text-gray-300">
+                                <div>
+                                    <p class="leading-relaxed mb-4">In het Proces Civiele Projecten is opgenomen dat in de beginfase van projecten een omgevingsanalyse gemaakt wordt. <strong class="font-bold">Deze analyse wordt altijd uitgevoerd, ongeacht de grootte of complexiteit van het project.</strong> Het doel hiervan is om inzichtelijk te krijgen welke groepen betrokken zijn bij het project en welke strategie er gevolgd moet worden.</p>
+                                    <p class="leading-relaxed mb-4">Dit dashboard is het hulpmiddel om de omgevingsanalyse uit te voeren. Hierin bepalen we de opgave, inventariseren en analyseren we issues, belangen, standpunten en leggen we omgevingsrisico's, kansen en acties vast.</p>
+                                    
+                                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-somBlue text-sm">
+                                        <p>Het stappenplan van dit dashboard is opgebouwd op basis van de <strong>SOM-methodiek</strong> (Strategisch Omgevingsmanagement) van WesselinkVanZijst. Dit dashboard is specifiek gericht op het <strong>eerste kwadrant (Analyse)</strong> van de SOM-cirkel.</p>
+                                        <p class="mt-2"><a href="https://www.wesselinkvanzijst.nl/kenniscentrum/tools/som-model" target="_blank" class="text-somBlue dark:text-blue-400 font-bold hover:underline">Lees meer over het SOM-model op WesselinkVanZijst ➔</a></p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-blue-50 dark:bg-blue-900/10 p-5 rounded-xl border border-blue-100 dark:border-blue-800 text-sm">
+                                    <p class="font-bold text-somBlue dark:text-blue-400 mb-2 flex items-center text-base"><span class="mr-2">💾</span> Hoe sla ik mijn werk op?</p>
+                                    <p class="mb-3">Je voortgang wordt tijdens het typen <strong>automatisch lokaal onthouden</strong> door je browser. Sluit je de app af en kom je later terug op dezelfde pc? Dan staat je werk gewoon voor je klaar.</p>
+                                    <p class="mb-3">Wil je het <strong>definitief opslaan in een projectmap</strong> of delen met collega's? Gebruik dan het menu bovenaan:</p>
+                                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-600 dark:text-gray-400">
+                                        <li><strong>Bestand > Opslaan als...</strong> <kbd class="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">Ctrl+Shift+S</kbd> (Maakt een .json bestand aan op je netwerkschijf)</li>
+                                        <li><strong>Bestand > Openen...</strong> <kbd class="bg-gray-200 dark:bg-gray-700 px-1 rounded text-xs">Ctrl+O</kbd> (Laad een project in van jezelf of een collega)</li>
+                                        <li><strong>Exporteren > Naar Word</strong> (Genereert een leesbaar rapport)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="flex justify-end pt-4">
+                                    <button onclick="switchTab('step1')" class="bg-somBlue text-white px-6 py-2 rounded-lg font-bold hover:bg-somDarkBlue transition shadow-md">Start met Stap 1 ➔</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 1: Opgave -->
+                <section id="sect_step1" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somBlue overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold text-somBlue dark:text-blue-400 flex items-center">
+                                    <span class="w-8 h-8 rounded-full bg-somBlue text-white flex items-center justify-center text-sm mr-3 print:hidden">1</span>
+                                    <span class="print:mr-2">1.</span> Opgave bepalen
+                                </h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Wat is de kern van het project?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Wat is de opgave?</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeld:</strong> Het vervangen van de riolering...
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_1" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Omschrijf concreet (bv. riolering vervangen)..." oninput="autoResize(this)"></textarea>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Wat is het doel?</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeld:</strong> Een klimaatbestendige wijk...
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_2" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Resultaat (bv. klimaatbestendige wijk)..." oninput="autoResize(this)"></textarea>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Waarom (nu) nodig?</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeld:</strong> Huidige riolering is 60 jaar oud...
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_3" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Urgentie (bv. 60 jaar oud)..." oninput="autoResize(this)"></textarea>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Impact omgeving?</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-72 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeelden:</strong>
+                                            <ul class="list-disc list-inside mt-1 space-y-1">
+                                                <li><strong>Verkeer:</strong> Omleidingen, parkeerdruk, bevoorrading winkels?</li>
+                                                <li><strong>Veiligheid:</strong> Schoolroutes, bereikbaarheid hulpdiensten?</li>
+                                                <li><strong>Events:</strong> Kermis, weekmarkt, sportwedstrijden?</li>
+                                                <li><strong>Fysiek:</strong> Trillingen, geluid, stof, grondwaterstand?</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_4" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Hinder/Verandering..." oninput="autoResize(this)"></textarea>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Omgevingsrisico's</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeld:</strong> Bedreigingen voor voortgang/draagvlak? (bv. bezwaar, negatieve media)
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_5" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Bedreigingen (bezwaar, media)..." oninput="autoResize(this)"></textarea>
+                                </div>
+                                <div class="relative">
+                                    <div class="flex justify-between items-center mb-2 group">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Omgevingskansen</label>
+                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
+                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeld:</strong> Mogelijkheden voor meerwaarde? (bv. meekoppelkansen, inwonersinitiatief)
+                                        </div>
+                                    </div>
+                                    <textarea id="input_opgave_6" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Meerwaarde (meekoppelkansen)..." oninput="autoResize(this)"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <div></div>
+                                <button onclick="switchTab('step2')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 2: Issues & Stakeholders -->
+                <section id="sect_step2" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somOrange overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somOrange flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somOrange text-white flex items-center justify-center text-sm mr-3 print:hidden">2</span>
+                                <span class="print:mr-2">2.</span> Inventarisatie issues & stakeholders
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Bepaal de issues en koppel hier stakeholders aan.</p>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            
+                            <!-- Hulpblok Stap 2 -->
+                            <details class="mb-8 border border-orange-200 bg-orange-50 dark:bg-orange-900/10 dark:border-orange-800 rounded-xl group/help print:break-inside-avoid shadow-sm">
+                                <summary class="cursor-pointer p-4 font-bold text-somOrange dark:text-orange-300 flex justify-between items-center select-none text-sm">
+                                    <span class="flex items-center"><span class="mr-2 text-lg">🔍</span> Issue & stakeholder suggestielijst</span>
+                                    <span class="text-xs font-normal bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg shadow-sm border border-orange-100 dark:border-gray-700">Klik voor checklist & inspiratie</span>
+                                </summary>
+                                <div class="p-5 pt-0 text-sm text-gray-700 dark:text-gray-300">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-2">
+                                        <div>
+                                            <strong class="block mb-2 text-[11px] uppercase tracking-wider opacity-70 border-b border-orange-200/50 pb-1">Professioneel / Overheid</strong>
+                                            <ul class="text-xs space-y-1.5">
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Hulpdiensten (Veiligheidsregio)</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Nutspartijen (K&L)</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Waterschap / Provincie</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Woningcorporaties / OV</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong class="block mb-2 text-[11px] uppercase tracking-wider opacity-70 border-b border-orange-200/50 pb-1">Inwoners / Belangengroepen</strong>
+                                            <ul class="text-xs space-y-1.5">
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Aanwonenden / Omwonenden</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Dorpsraad / Wijkvereniging</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Reizigers / Weggebruikers</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Fietsersbond / Wandelbond</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong class="block mb-2 text-[11px] uppercase tracking-wider opacity-70 border-b border-orange-200/50 pb-1">Ondernemers</strong>
+                                            <ul class="text-xs space-y-1.5">
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Winkeliers / Detailhandel</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Horeca & Terrassen</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Bedrijven (aanliggend)</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Leveranciers / Transport</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <strong class="block mb-2 text-[11px] uppercase tracking-wider opacity-70 border-b border-orange-200/50 pb-1">Maatschappelijke org.</strong>
+                                            <ul class="text-xs space-y-1.5">
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Scholen & Kinderopvang</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Sportverenigingen</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Zorginstellingen</li>
+                                                <li class="flex items-start"><span class="mr-1.5 text-gray-400">□</span> Kerken / Buurthuizen</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-6 pt-5 border-t border-orange-200/50 dark:border-orange-800/50">
+                                        <strong class="block mb-3 text-sm text-somOrange dark:text-orange-400">Veelvoorkomende Issues (Ter inspiratie)</strong>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                            <ul class="text-xs space-y-2">
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Bereikbaarheid:</strong><br><span class="text-gray-500">Tijdelijke wegafsluitingen, omleidingen</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Parkeren:</strong><br><span class="text-gray-500">(Tijdelijk) verlies van parkeerplekken of loopafstand</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Overlast uitvoering:</strong><br><span class="text-gray-500">Geluid, trillingen, stof, zwaar bouwverkeer</span></li>
+                                            </ul>
+                                            <ul class="text-xs space-y-2">
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Groen & Bomen:</strong><br><span class="text-gray-500">Bomenkap, locatie van nieuw groen, soortkeuze</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Veiligheid:</strong><br><span class="text-gray-500">Veilige oversteek, schoolroutes, openbare verlichting</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Water & Klimaat:</strong><br><span class="text-gray-500">Verplicht afkoppelen regenwater, wateroverlast</span></li>
+                                            </ul>
+                                            <ul class="text-xs space-y-2">
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Inrichting:</strong><br><span class="text-gray-500">Snelheidsremmende maatregelen (drempels), straatmeubilair</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Geld / Waarde:</strong><br><span class="text-gray-500">Waardedaling woning, planschade, eigen bijdrage</span></li>
+                                                <li><strong class="text-gray-800 dark:text-gray-200">Communicatie:</strong><br><span class="text-gray-500">Tijdigheid van informatie, inspraakmogelijkheden</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <div class="grid lg:grid-cols-2 gap-8">
+                                <div class="flex flex-col">
+                                    <div class="bg-orange-50 dark:bg-orange-900/10 p-5 rounded-xl border border-orange-100 dark:border-orange-800/50 h-full">
+                                        <h3 class="font-bold text-somOrange mb-4 flex justify-between items-center text-lg">
+                                            Issues Definiëren
+                                            <button onclick="addIssue()" class="text-sm bg-somOrange text-white px-3 py-1.5 rounded-lg hover:bg-orange-600 no-print font-medium transition shadow-sm">+ Nieuw Issue</button>
+                                        </h3>
+                                        <div id="issuesContainer" class="space-y-4"></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col h-full min-h-[400px]">
+                                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 flex flex-col relative overflow-hidden h-full shadow-sm">
+                                        <h3 class="font-bold text-gray-800 dark:text-white text-lg mb-3 border-b border-gray-100 dark:border-gray-700 pb-2">Stakeholders Toevoegen</h3>
+                                        
+                                        <div class="space-y-3 mb-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                                            <input type="text" id="new_sh_name" placeholder="Naam stakeholder (Bv. Aanwonenden Kerkstraat)" class="w-full p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 bg-white focus:ring-2 focus:ring-somOrange focus:outline-none" onkeypress="if(event.key === 'Enter') document.getElementById('new_sh_address').focus()">
+                                            <div class="flex gap-2">
+                                                <input type="text" id="new_sh_address" placeholder="Adres / Woonplaats (Optioneel voor kaart)" class="flex-grow p-2.5 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 bg-white focus:ring-2 focus:ring-somOrange focus:outline-none" onkeypress="if(event.key === 'Enter') addProjectStakeholderFromInputs()">
+                                                <button onclick="addProjectStakeholderFromInputs()" class="bg-somOrange hover:bg-orange-600 text-white px-5 rounded-lg font-bold transition shadow-sm">Toevoegen</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex-1 overflow-y-auto pr-2 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 p-2">
+                                            <ul id="list_sec2" class="shared-sh-list space-y-1"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 border border-gray-200 dark:border-gray-700 rounded-xl p-1 shadow-sm h-[400px] relative w-full overflow-hidden bg-white dark:bg-gray-800">
+                                <div id="map-container" class="w-full h-full rounded-lg z-10"></div>
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step1')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step3')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 3: Disciplines -->
+                <section id="sect_step3" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somTeal overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somTeal flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somTeal text-white flex items-center justify-center text-sm mr-3 print:hidden">3</span>
+                                <span class="print:mr-2">3.</span> Interne inventarisatie vakdisciplines
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Wat is de impact per technische discipline?</p>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Groen</label>
+                                        <input type="text" id="contact_groen" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_groen" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Bomenkap? Wortelopdruk? Kansen voor vergroening?" oninput="autoResize(this)"></textarea>
+                                </div>
+                                
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Riolering & Water</label>
+                                        <input type="text" id="contact_riool" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_riool" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Straat open? Afkoppelen regenpijpen?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Wegen</label>
+                                        <input type="text" id="contact_wegen_beheer" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_wegen_beheer" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Kwaliteit verharding? Schadebeelden?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Verkeer</label>
+                                        <input type="text" id="contact_verkeer" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_verkeer" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Parkeerdruk? Snelheidsremmers? Schoolroutes?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Klimaatadaptatie</label>
+                                        <input type="text" id="contact_klimaat" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_klimaat" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Hittestress? Infiltratie? Ontstening?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Kunstwerken</label>
+                                        <input type="text" id="contact_kunstwerken" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_kunstwerken" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Vervanging? Brug in achtertuin (privacy)?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Openbare Verlichting</label>
+                                        <input type="text" id="contact_ovl" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_ovl" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Lichtinval in woningen? Verplaatsen masten?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Spelen</label>
+                                        <input type="text" id="contact_spelen" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_spelen" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Verandering doelgroep speelplek?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Evenementen</label>
+                                        <input type="text" id="contact_evenementen" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_evenementen" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Check de evenementenkalender." oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Inwonersinitiatieven</label>
+                                        <input type="text" id="contact_inwoners" class="text-xs w-1/2 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_inwoners" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Adoptiegroen? Geveltuintjes?" oninput="autoResize(this)"></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 lg:col-span-2">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="font-bold text-gray-700 dark:text-gray-200">Beheer & Onderhoud / Overig</label>
+                                        <input type="text" id="contact_overig" class="text-xs w-1/3 bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-somTeal text-gray-600 dark:text-gray-400 text-right" placeholder="Afgestemd met...">
+                                    </div>
+                                    <textarea id="disc_overig" rows="3" class="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden" placeholder="Bekende klachten of meldingen uit de buurt (BinnenBeter)?" oninput="autoResize(this)"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step2')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step4')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 4: Matrix -->
+                <section id="sect_step4" class="step-section hidden animate-fade-in print-landscape">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somBlue overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somBlue flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somBlue text-white flex items-center justify-center text-sm mr-3 print:hidden">4</span>
+                                <span class="print:mr-2">4.</span> SOM Basismatrix
+                            </h2>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="mb-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                <p class="font-medium text-somBlue dark:text-blue-400 mb-2">Wat is op basis van de stakeholders en de belangen het voorlopige participatieniveau en hoe willen we daar invulling aan geven? Geef hier aan wat de omgevingsgerichte aanpak wordt.</p>
+                                <p class="italic text-gray-500 dark:text-gray-400">Vertaal de issues en stakeholders naar een overzichtelijke matrix. Vul per stakeholder het verwachte belang in bij elk issue, en geef ook de verwachte spanning aan. Dit dient later gevalideerd te worden in de stakeholdergesprekken.</p>
+                            </div>
+
+                            <div class="flex flex-wrap gap-4 md:gap-8 mb-6 text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+                                <div class="flex flex-wrap items-center gap-3"><strong class="text-somBlue uppercase tracking-wide">Verwacht belang:</strong><span class="flex items-center gap-1"><span class="w-3 h-3 bg-gray-200 rounded border border-gray-300"></span> Geen</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-slate-400 rounded border border-gray-300"></span> Onduidelijk</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-200 rounded border border-gray-300"></span> Nauwelijks</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-400 rounded border border-gray-300"></span> Redelijk</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-600 rounded border border-gray-300"></span> Groot</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-800 rounded border border-gray-300"></span> Extreem groot</span></div>
+                                <div class="flex flex-wrap items-center gap-3"><strong class="text-somRed uppercase tracking-wide">Verwachte spanning:</strong><span class="flex items-center gap-1"><span class="w-3 h-3 bg-gray-200 rounded border border-gray-300"></span> Geen spanning</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-slate-400 rounded border border-gray-300"></span> Onduidelijk</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-400 rounded border border-gray-300"></span> Positief</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-yellow-400 rounded border border-gray-300"></span> Aandacht</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-400 rounded border border-gray-300"></span> Waarschuwing</span><span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-600 rounded border border-gray-300"></span> Kritiek</span></div>
+                            </div>
+
+                            <!-- Grouping UI -->
+                            <div class="flex items-center gap-3 mb-6 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800 w-fit no-print">
+                                <label class="text-sm font-bold text-somBlue">Stakeholders groeperen:</label>
+                                <input type="text" id="new_group_name" placeholder="Naam nieuwe groep..." class="text-sm p-1.5 border rounded dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:border-somBlue focus:ring-1 focus:ring-somBlue" onkeypress="if(event.key === 'Enter') addStakeholderGroup()">
+                                <button onclick="addStakeholderGroup()" class="bg-somBlue text-white px-3 py-1.5 rounded text-sm font-bold shadow-sm hover:bg-somDarkBlue transition">+ Groep aanmaken</button>
+                            </div>
+                            
+                            <div class="overflow-x-auto matrix-scroll-wrapper border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <table class="w-full text-sm text-left border-collapse min-w-[800px]">
+                                    <thead id="matrixHeadBasic" class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700"></thead>
+                                    <tbody id="matrixBodyBasic" class="dark:text-gray-200 divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step3')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step5')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 5: Strategie -->
+                <section id="sect_step5" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somDarkBlue overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somDarkBlue dark:text-blue-400 flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somDarkBlue text-white flex items-center justify-center text-sm mr-3 print:hidden">5</span>
+                                <span class="print:mr-2">5.</span> Strategie: Wat is onze aanpak?
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Wat is op basis van de stakeholders en de belangen het voorlopige participatieniveau en hoe willen we daar invulling aan geven? Geef hier aan wat de omgevingsgerichte aanpak wordt.</p>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div class="grid lg:grid-cols-4 gap-4 mb-8">
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-t-4 border-gray-100 dark:border-gray-700 border-t-gray-400">
+                                    <h4 class="font-bold text-gray-700 dark:text-gray-200 mb-1">1. Meeweten</h4>
+                                    <p class="text-xs italic mb-2 text-gray-500">"Wij vertellen u wat er gaat gebeuren."</p>
+                                    <ul class="text-xs space-y-1 text-gray-600 dark:text-gray-400">
+                                        <li><strong>Doel:</strong> Informeren.</li>
+                                        <li><strong>Middelen:</strong> Brief, projectbord, website.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-t-4 border-gray-100 dark:border-gray-700 border-t-yellow-400">
+                                    <h4 class="font-bold text-gray-700 dark:text-gray-200 mb-1">2. Meedenken</h4>
+                                    <p class="text-xs italic mb-2 text-gray-500">"Wij horen graag uw mening."</p>
+                                    <ul class="text-xs space-y-1 text-gray-600 dark:text-gray-400">
+                                        <li><strong>Doel:</strong> Ideeën ophalen.</li>
+                                        <li><strong>Middelen:</strong> Inloopavond, enquête, gesprek.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-t-4 border-gray-100 dark:border-gray-700 border-t-somOrange">
+                                    <h4 class="font-bold text-gray-700 dark:text-gray-200 mb-1">3. Meewerken</h4>
+                                    <p class="text-xs italic mb-2 text-gray-500">"Samen aan de slag."</p>
+                                    <ul class="text-xs space-y-1 text-gray-600 dark:text-gray-400">
+                                        <li><strong>Doel:</strong> Coproductie.</li>
+                                        <li><strong>Middelen:</strong> Werkatelier, klankbordgroep.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-t-4 border-gray-100 dark:border-gray-700 border-t-somBlue">
+                                    <h4 class="font-bold text-gray-700 dark:text-gray-200 mb-1">4. Meebepalen</h4>
+                                    <p class="text-xs italic mb-2 text-gray-500">"U beslist mee binnen kaders."</p>
+                                    <ul class="text-xs space-y-1 text-gray-600 dark:text-gray-400">
+                                        <li><strong>Doel:</strong> Partnerschap.</li>
+                                        <li><strong>Middelen:</strong> Stemmen, werkgroep, convenant.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-3">Algemene Strategie</h3>
+                                <textarea id="input_strategie" oninput="autoResize(this)" class="w-full p-4 border rounded-xl dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somDarkBlue focus:outline-none min-h-[150px] leading-relaxed" placeholder="Beschrijf hier de algemene omgevingsgerichte aanpak voor het gehele project..."></textarea>
+                            </div>
+
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">Strategie per Stakeholder (Uit Matrix)</h3>
+                                <div id="strategyPerStakeholderContainer" class="grid grid-cols-1 gap-4">
+                                    <!-- Wordt dynamisch gevuld -->
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step4')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step_contacten')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 6: Contactenlijst -->
+                <section id="sect_step_contacten" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-purple-500 overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700 flex justify-between items-start">
+                            <div>
+                                <h2 class="text-2xl font-bold text-purple-600 flex items-center">
+                                    <span class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-sm mr-3 print:hidden">6</span>
+                                    <span class="print:mr-2">6.</span> Contactenlijst
+                                </h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Beheer de contactgegevens (telefoon, e-mail, etc) van de stakeholders uit stap 2.</p>
+                            </div>
+                            <button onclick="exportContactsToCSV()" class="bg-purple-50 dark:bg-gray-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-gray-600 px-4 py-2 rounded-lg font-bold hover:bg-purple-100 dark:hover:bg-gray-700 transition shadow-sm text-sm flex items-center no-print">
+                                <span class="mr-2">📊</span> Naar Excel (.csv)
+                            </button>
+                        </div>
+                        
+                        <div class="p-6 md:p-8">
+                            <div id="contactenContainer" class="space-y-4">
+                                <!-- Dynamisch gevuld via JS -->
+                            </div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step5')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step6')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 7: Gesprekken (was 6) -->
+                <section id="sect_step6" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somYellow overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somYellow flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somYellow text-white flex items-center justify-center text-sm mr-3 print:hidden">7</span>
+                                <span class="print:mr-2">7.</span> Uitkomsten stakeholdergesprekken
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Log gespreksnotities per stakeholder.</p>
+                        </div>
+                        <div class="p-6 md:p-8">
+                            <div id="remarksContainer"></div>
+                            
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step_contacten')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <button onclick="switchTab('step7')" class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition">Volgende ➔</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTIE 8: Borging (was 7) -->
+                <section id="sect_step7" class="step-section hidden animate-fade-in">
+                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border-t-8 border-somGreen overflow-hidden">
+                        <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-2xl font-bold text-somGreen flex items-center">
+                                <span class="w-8 h-8 rounded-full bg-somGreen text-white flex items-center justify-center text-sm mr-3 print:hidden">8</span>
+                                <span class="print:mr-2">8.</span> Borging
+                            </h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Afronding en projectgegevens.</p>
+                        </div>
+                        <div class="p-6 md:p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                                <div>
+                                    <label class="font-bold text-gray-700 dark:text-gray-200 block mb-2">Opgesteld door</label>
+                                    <input type="text" id="borging_door" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-somGreen focus:outline-none bg-gray-50 dark:bg-gray-800/50" placeholder="Naam...">
+                                </div>
+                                <div>
+                                    <label class="font-bold text-gray-700 dark:text-gray-200 block mb-2">Samen met</label>
+                                    <input type="text" id="borging_met" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-somGreen focus:outline-none bg-gray-50 dark:bg-gray-800/50" placeholder="Namen (bv. omgevingsmanager, projectleider)...">
+                                </div>
+                                <div>
+                                    <label class="font-bold text-gray-700 dark:text-gray-200 block mb-2">Datum</label>
+                                    <input type="date" id="borging_datum" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-somGreen focus:outline-none bg-gray-50 dark:bg-gray-800/50">
+                                </div>
+                                <div>
+                                    <label class="font-bold text-gray-700 dark:text-gray-200 block mb-2">Status</label>
+                                    <select id="val_status" onchange="syncStatus('val_status')" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-somGreen focus:outline-none bg-gray-50 dark:bg-gray-800/50 cursor-pointer">
+                                        <option value="Concept">Concept</option>
+                                        <option value="Ter review">Ter review</option>
+                                        <option value="Definitief">Definitief</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-12 p-6 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="font-bold text-somGreen dark:text-green-400 text-lg">Klaar met invullen?</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Je kunt het document nu veilig opslaan of exporteren naar Word.</p>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
+                                    <button onclick="saveProjectAs()" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg font-bold hover:bg-gray-50 transition shadow-sm">💾 Opslaan als...</button>
+                                    <button onclick="exportToWord()" class="bg-somGreen text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition shadow-sm">📄 Naar Word</button>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between pt-8">
+                                <button onclick="switchTab('step6')" class="text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2 font-medium">🡠 Terug</button>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- SAFE LOCALSTORAGE WRAPPER ---
+        // Soms blokkeren preview-omgevingen localStorage. Deze wrapper zorgt dat de code niet crasht.
+        const safeStorage = {
+            get: function(key) {
+                try { return localStorage.getItem(key); } catch(e) { return null; }
+            },
+            set: function(key, val) {
+                try { localStorage.setItem(key, val); } catch(e) { console.warn("Opslag geblokkeerd"); }
+            },
+            remove: function(key) {
+                try { localStorage.removeItem(key); } catch(e) { console.warn("Opslag geblokkeerd"); }
+            }
+        };
+
+        let projectStakeholders = []; 
+        let stakeholderGroups = []; 
+        let issuesData = []; 
+        let matrixData = {}; 
+        let actionTableData = []; 
+        let map; 
+        let markers = []; 
+        
+        let activeFileHandle = null;
+        let hasUnsavedChanges = false;
+
+        window.onload = function() {
+            loadData();
+            if(issuesData.length === 0) {
+                issuesData = [
+                    {id: 1, title: 'Issue 1', linkedSh: []},
+                    {id: 2, title: 'Issue 2', linkedSh: []},
+                    {id: 3, title: 'Issue 3', linkedSh: []}
+                ];
+            }
+            
+            // Zorg ervoor dat de UI voor stap 2 altijd wordt getekend, 
+            // ook nadat er data is ingeladen via een JSON bestand.
+            renderIssues();
+            renderProjectStakeholders();
+
+            renderMatrixTable(); 
+            renderRemarks(); 
+            renderStrategyPerStakeholder(); 
+            renderContactenlijst();
+            checkTheme();
+            updateProgress();
+            
+            // Set initial un-saved state to false after initial load
+            setUnsavedChanges(false);
+
+            document.querySelectorAll('textarea, input[type="text"], input[type="date"], select, input[type="radio"]').forEach(el => {
+                el.addEventListener('input', () => {
+                    setUnsavedChanges(true);
+                    saveDataLocal(); 
+                    updateProgress();
+                });
+            });
+
+            // Init Map functionality
+            initMap();
+            
+            // UI setup
+            setupKeyboardShortcuts();
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.relative')) {
+                    closeAllDropdowns();
+                }
+            });
+        };
+
+        // --- UI & NAVIGATIE LOGICA ---
+        
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.step-section').forEach(sect => {
+                sect.classList.add('hidden');
+                sect.classList.remove('block');
+            });
+            // Show target section
+            const target = document.getElementById('sect_' + tabId);
+            if(target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+            
+            // Update sidebar styles
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.classList.remove('bg-blue-50', 'text-somBlue', 'border-somBlue', 'dark:bg-blue-900/30', 'dark:text-blue-400');
+                tab.classList.add('text-gray-600', 'border-transparent', 'dark:text-gray-400');
+            });
+            const activeTabBtn = document.getElementById('tab-' + tabId);
+            if(activeTabBtn) {
+                activeTabBtn.classList.remove('text-gray-600', 'border-transparent', 'dark:text-gray-400');
+                activeTabBtn.classList.add('bg-blue-50', 'text-somBlue', 'border-somBlue', 'dark:bg-blue-900/30', 'dark:text-blue-400');
+            }
+
+            // Scroll to top of main area
+            document.getElementById('main-scroll-area').scrollTop = 0;
+
+            // Specifieke tab fixes
+            if(tabId === 'step2' && map) {
+                setTimeout(() => { map.invalidateSize(); }, 150);
+            }
+            if(tabId === 'step1' || tabId === 'step3' || tabId === 'step4' || tabId === 'step5' || tabId === 'step6') {
+                setTimeout(() => {
+                    document.querySelectorAll('#sect_'+tabId+' textarea').forEach(el => autoResize(el));
+                }, 50);
+            }
+        }
+
+        function toggleDropdown(id, event) {
+            if(event) event.stopPropagation();
+            const el = document.getElementById(id);
+            const isHidden = el.classList.contains('hidden');
+            closeAllDropdowns();
+            if(isHidden) el.classList.remove('hidden');
+        }
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+        }
+
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', function(e) {
+                // Ctrl+S of Cmd+S
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        saveProjectAs();
+                    } else {
+                        e.preventDefault();
+                        saveProject();
+                    }
+                }
+                // Ctrl+O of Cmd+O
+                if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+                    e.preventDefault();
+                    openProject();
+                }
+                // Ctrl+P of Cmd+P
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    // Browser native print will handle this, but we hook it to prepare
+                    prepareAndPrint();
+                }
+            });
+        }
+
+        function setUnsavedChanges(status) {
+            hasUnsavedChanges = status;
+            const indicator = document.getElementById('save-indicator');
+            if(status) {
+                indicator.classList.remove('hidden');
+                indicator.classList.add('flex');
+            } else {
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+            }
+        }
+
+        // --- CUSTOM MODAL ---
+        let modalConfirmCallback = null;
+        function showModal(title, msg, confirmAction) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            modalConfirmCallback = confirmAction;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            
+            // Focus op annuleren om accidentele enters te voorkomen
+            document.querySelector('#custom-modal button').focus();
+            
+            document.getElementById('modal-confirm-btn').onclick = function() {
+                if(modalConfirmCallback) modalConfirmCallback();
+                closeModal();
+            };
+        }
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            modalConfirmCallback = null;
+        }
+
+        function confirmReset() {
+            showModal(
+                "Nieuw Project / Reset", 
+                "Weet je zeker dat je alle gegevens wilt wissen en met een schoon document wilt beginnen? Onopgeslagen wijzigingen gaan verloren.",
+                function() {
+                    safeStorage.remove('somData');
+                    projectStakeholders = [];
+                    issuesData = [];
+                    matrixData = {};
+                    actionTableData = [];
+                    stakeholderGroups = [];
+                    activeFileHandle = null;
+                    safeStorage.set('somData', JSON.stringify({})); 
+                    location.reload();
+                }
+            );
+        }
+
+        // --- DATA & OPSLAAN LOGICA ---
+
+        function saveDataLocal() {
+            const inputs = document.querySelectorAll('textarea, input[type="text"], input[type="date"], select, input[type="radio"]');
+            const data = {};
+            inputs.forEach(input => {
+                if(input.id && !input.id.startsWith('matrix_') && !input.classList.contains('shared-sh-input') && !input.classList.contains('issue-title-input') && !input.id.startsWith('act_') && !input.id.startsWith('new_sh_')) {
+                    if (input.type === 'radio') {
+                        if (input.checked) data[input.name] = input.value;
+                    } else {
+                        data[input.id] = input.value;
+                    }
+                }
+            });
+
+            data['projectStakeholders'] = JSON.stringify(projectStakeholders);
+            data['stakeholderGroups'] = JSON.stringify(stakeholderGroups);
+            data['issuesData'] = JSON.stringify(issuesData);
+            data['matrixData'] = JSON.stringify(matrixData);
+            
+            const now = new Date();
+            const timeStr = now.toLocaleDateString('nl-NL') + ' ' + now.toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'});
+            data['lastSaved'] = timeStr;
+            safeStorage.set('somData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const raw = safeStorage.get('somData');
+            if(!raw) return;
+            const data = JSON.parse(raw);
+            for (const [key, value] of Object.entries(data)) {
+                const el = document.getElementById(key);
+                if(el && (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.type === 'text' || el.type === 'date') && el.id !== 'project_subtitle') el.value = value;
+                if(key === 'project_subtitle' && document.getElementById('project_subtitle')) document.getElementById('project_subtitle').value = value;
+            }
+            
+            if(data.val_status && document.getElementById('header_status')) {
+                document.getElementById('header_status').value = data.val_status;
+            } else if (data.header_status && document.getElementById('val_status')) {
+                document.getElementById('val_status').value = data.header_status;
+            }
+
+            if(data.projectStakeholders) {
+                projectStakeholders = JSON.parse(data.projectStakeholders);
+                projectStakeholders.forEach(sh => {
+                    if (sh.remarks !== undefined || sh.conversationDate !== undefined) {
+                        if (!sh.conversations) sh.conversations = [];
+                        sh.conversations.push({ date: sh.conversationDate || '', notes: sh.remarks || '' });
+                        delete sh.remarks; delete sh.conversationDate;
+                    }
+                });
+            }
+            if(data.stakeholderGroups) stakeholderGroups = JSON.parse(data.stakeholderGroups);
+            if(data.issuesData) issuesData = JSON.parse(data.issuesData);
+            if(data.matrixData) matrixData = JSON.parse(data.matrixData);
+            
+            if(data.lastSaved) {
+                document.getElementById('lastSaved').innerText = "Opgeslagen: " + data.lastSaved;
+            }
+        }
+
+        // --- PWA BESTANDSBEHEER API ---
+        
+        async function openProject() {
+            if (window.showOpenFilePicker) {
+                try {
+                    [activeFileHandle] = await window.showOpenFilePicker({
+                        types: [{ description: 'SOM JSON Bestand', accept: {'application/json': ['.json']} }],
+                    });
+                    const file = await activeFileHandle.getFile();
+                    const contents = await file.text();
+                    safeStorage.set('somData', contents);
+                    location.reload();
+                } catch (err) {
+                    console.log('Openen geannuleerd of fout', err);
+                }
+            } else {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if(!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        safeStorage.set('somData', evt.target.result);
+                        location.reload(); 
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+        }
+
+        async function saveProject() {
+            saveDataLocal();
+            const data = safeStorage.get('somData');
+            
+            if (!activeFileHandle) {
+                await saveProjectAs();
+                return;
+            }
+            
+            try {
+                const writable = await activeFileHandle.createWritable();
+                await writable.write(data);
+                await writable.close();
+                setUnsavedChanges(false);
+                
+                const indicator = document.getElementById('save-indicator');
+                indicator.innerHTML = '<span class="text-somGreen">✓ Opgeslagen</span>';
+                indicator.classList.remove('hidden');
+                indicator.classList.add('flex');
+                setTimeout(() => { 
+                    if(!hasUnsavedChanges) {
+                        indicator.classList.add('hidden');
+                        indicator.innerHTML = '<span class="text-somOrange mr-1">*</span> Wijzigingen';
+                    }
+                }, 2000);
+
+            } catch (err) {
+                console.error('Fout bij opslaan:', err);
+                alert('Kon niet direct opslaan op deze locatie. Gebruik "Opslaan als".');
+            }
+        }
+
+        async function saveProjectAs() {
+            saveDataLocal();
+            const data = safeStorage.get('somData');
+            const defaultName = 'Omgevingsanalyse_' + (document.getElementById('project_subtitle').value || 'Project') + '.json';
+
+            if (window.showSaveFilePicker) {
+                try {
+                    activeFileHandle = await window.showSaveFilePicker({
+                        suggestedName: defaultName,
+                        types: [{ description: 'SOM JSON Bestand', accept: {'application/json': ['.json']} }],
+                    });
+                    const writable = await activeFileHandle.createWritable();
+                    await writable.write(data);
+                    await writable.close();
+                    setUnsavedChanges(false);
+                } catch (err) {
+                    if(err.name !== 'AbortError') fallbackDownload(data, defaultName);
+                }
+            } else {
+                fallbackDownload(data, defaultName);
+            }
+        }
+
+        function fallbackDownload(data, filename) {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(data);
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", filename);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            setUnsavedChanges(false);
+        }
+
+        // --- OVERIGE HULPFUNCTIES ---
+        
+        function syncStatus(sourceId) {
+            const header = document.getElementById('header_status');
+            const footer = document.getElementById('val_status');
+            const val = document.getElementById(sourceId).value;
+            if(header) header.value = val;
+            if(footer) footer.value = val;
+            setUnsavedChanges(true);
+            saveDataLocal();
+        }
+
+        function autoResize(el) {
+            if(!el) return;
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            safeStorage.set('darkMode', document.documentElement.classList.contains('dark'));
+        }
+        function checkTheme() {
+            if (safeStorage.get('darkMode') === 'true') document.documentElement.classList.add('dark');
+        }
+        function updateProgress() {
+            const inputs = document.querySelectorAll('textarea');
+            let visibleInputs = Array.from(inputs).filter(i => i.offsetParent !== null);
+            let filled = 0;
+            visibleInputs.forEach(i => { if(i.value.trim().length > 0) filled++; });
+            const pct = visibleInputs.length > 0 ? Math.round((filled / visibleInputs.length) * 100) : 0;
+            const bar = document.getElementById('progress-bar');
+            if(bar) bar.style.width = pct + '%';
+        }
+
+        // PWA Install
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('installAppBtn');
+            if (btn) { btn.classList.remove('hidden'); btn.classList.add('flex'); }
+        });
+        function installApp() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+                deferredPrompt = null;
+                const btn = document.getElementById('installAppBtn');
+                if (btn) btn.classList.add('hidden');
+            });
+        }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = "self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('activate', e => self.clients.claim()); self.addEventListener('fetch', e => {});";
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+            });
+        }
+
+        // --- EXPORT & PRINT ---
+        function exportToWord() {
+            saveDataLocal(); 
+            const val = (id) => { 
+                const el = document.getElementById(id); 
+                return el ? el.value.replace(/\n/g, '<br>') : ''; 
+            };
+
+            let content = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Zwartewaterland Omgevingsanalyse</title><style>body{font-family:'Calibri','Arial',sans-serif;font-size:11pt;}h1{color:#1E40AF;font-size:20pt;border-bottom:2px solid #2563EB;padding-bottom:5px;}h2{color:#2563EB;font-size:14pt;margin-top:20pt;}h3{color:#4B5563;font-size:12pt;}table{border-collapse:collapse;width:100%;margin-bottom:20px;}th,td{border:1px solid #9CA3AF;padding:6px;vertical-align:top;}th{background-color:#F3F4F6;text-align:left;font-weight:bold;}p{margin-bottom:10pt;}ul{margin-top:0;}</style></head><body>`;
+
+            content += `<h1>Zwartewaterland Omgevingsanalyse: ${val('project_subtitle') || 'Concept project'}</h1>`;
+
+            content += `<h2>1. Opgave bepalen</h2>`;
+            content += `<strong>Wat is de opgave?</strong><br><p>${val('input_opgave_1')}</p>`;
+            content += `<strong>Wat is het doel?</strong><br><p>${val('input_opgave_2')}</p>`;
+            content += `<strong>Waarom (nu) nodig?</strong><br><p>${val('input_opgave_3')}</p>`;
+            content += `<strong>Impact omgeving?</strong><br><p>${val('input_opgave_4')}</p>`;
+            content += `<strong>Omgevingsrisico's:</strong><br><p>${val('input_opgave_5')}</p>`;
+            content += `<strong>Omgevingskansen:</strong><br><p>${val('input_opgave_6')}</p>`;
+
+            content += `<h2>2. Issues & Stakeholders</h2>`;
+            content += `<h3>Issues</h3><ul>`;
+            issuesData.forEach(i => content += `<li>${i.title}</li>`);
+            content += `</ul><h3>Stakeholders</h3><ul>`;
+            projectStakeholders.forEach(s => content += `<li>${s.name} ${s.address ? '('+s.address+')' : ''}</li>`);
+            content += `</ul>`;
+
+            content += `<h2>3. Interne inventarisatie vakdisciplines</h2>`;
+            const disciplines = [
+                {id: 'groen', name: 'Groen'}, {id: 'riool', name: 'Riolering & Water'},
+                {id: 'wegen_beheer', name: 'Wegen'}, {id: 'verkeer', name: 'Verkeer'},
+                {id: 'klimaat', name: 'Klimaatadaptatie'}, {id: 'kunstwerken', name: 'Kunstwerken'},
+                {id: 'ovl', name: 'Openbare Verlichting'}, {id: 'spelen', name: 'Spelen'},
+                {id: 'evenementen', name: 'Evenementen'}, {id: 'inwoners', name: 'Inwonersinitiatieven'},
+                {id: 'overig', name: 'Beheer & Onderhoud / Overig'}
+            ];
+            content += `<table><tr><th width="20%">Discipline</th><th width="30%">Afgestemd met</th><th width="50%">Impact / Notities</th></tr>`;
+            disciplines.forEach(d => {
+                content += `<tr><td><strong>${d.name}</strong></td><td>${val('contact_'+d.id)}</td><td>${val('disc_'+d.id)}</td></tr>`;
+            });
+            content += `</table>`;
+
+            content += `<h2>4. SOM Basismatrix</h2>`;
+            content += `<table><tr><th>Stakeholder</th>`;
+            issuesData.forEach(issue => content += `<th>${issue.title}</th>`);
+            content += `<th>Verwacht Belang</th><th>Verwachte Spanning</th><th>Strategie</th><th>Opmerkingen</th></tr>`;
+            
+            const renderExportRow = (sh, idx) => {
+                const uid = 'p_' + idx;
+                let rowContent = `<tr><td><strong>${sh.name}</strong></td>`;
+                issuesData.forEach(issue => {
+                    const isLinked = issue.linkedSh && issue.linkedSh.includes(idx);
+                    if(isLinked) rowContent += `<td>${matrixData[`m_i${issue.id}_b_${uid}`] || ''}</td>`;
+                    else rowContent += `<td><em>N.v.t.</em></td>`;
+                });
+                const mapColor = (c, type) => {
+                    if(!c) return '';
+                    if (type === 'int') {
+                        if(c.includes('bg-slate-400')) return 'Onduidelijk belang';
+                        if(c.includes('bg-blue-200')) return 'Nauwelijks Belang';
+                        if(c.includes('bg-blue-400')) return 'Redelijk Belang';
+                        if(c.includes('bg-blue-600') || c.includes('bg-blue-700')) return 'Groot belang';
+                        if(c.includes('bg-blue-800')) return 'Extreem groot belang';
+                        return 'Geen belang';
+                    } else {
+                        if(c.includes('bg-slate-400')) return 'Onduidelijk';
+                        if(c.includes('bg-green-400')) return 'Positief';
+                        if(c.includes('bg-yellow-400')) return 'Aandacht';
+                        if(c.includes('bg-orange-400')) return 'Waarschuwing';
+                        if(c.includes('bg-red-600')) return 'Kritiek';
+                        return 'Geen spanning';
+                    }
+                };
+                rowContent += `<td>${mapColor(matrixData[`m_int_${uid}`], 'int')}</td>`;
+                rowContent += `<td>${mapColor(matrixData[`m_ten_${uid}`], 'ten')}</td>`;
+                rowContent += `<td>${matrixData[`m_strat_${uid}`] || ''}</td>`;
+                rowContent += `<td>${matrixData[`m_notes_${uid}`] || ''}</td></tr>`;
+                return rowContent;
+            };
+
+            if (stakeholderGroups && stakeholderGroups.length > 0) {
+                stakeholderGroups.forEach(group => {
+                    content += `<tr><td colspan="${issuesData.length + 5}" style="background-color: #DBEAFE;"><strong>📂 Groep: ${group.name}</strong></td></tr>`;
+                    projectStakeholders.forEach((sh, idx) => {
+                        if (sh.groupId == group.id) content += renderExportRow(sh, idx);
+                    });
+                });
+                const ungrouped = projectStakeholders.filter(sh => !sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId));
+                if (ungrouped.length > 0) {
+                    content += `<tr><td colspan="${issuesData.length + 5}" style="background-color: #F3F4F6;"><strong>Ongroepeerd</strong></td></tr>`;
+                    projectStakeholders.forEach((sh, idx) => {
+                        if (!sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId)) content += renderExportRow(sh, idx);
+                    });
+                }
+            } else {
+                projectStakeholders.forEach((sh, idx) => {
+                    content += renderExportRow(sh, idx);
+                });
+            }
+            content += `</table>`;
+
+            content += `<h2>5. Strategie: Wat is onze omgevingsgerichte aanpak?</h2>`;
+            content += `<h3>Algemene Strategie</h3><p>${val('input_strategie')}</p>`;
+            content += `<h3>Strategie per Stakeholder</h3><ul>`;
+            projectStakeholders.forEach(sh => {
+                if(sh.strategyText) content += `<li><strong>${sh.name}:</strong><br>${sh.strategyText.replace(/\n/g, '<br>')}</li>`;
+            });
+            content += `</ul>`;
+
+            content += `<h2>6. Contactenlijst</h2>`;
+            content += `<table><tr><th width="25%">Stakeholder / Organisatie</th><th width="20%">Contactpersoon</th><th width="15%">Telefoon</th><th width="20%">E-mail</th><th width="20%">Adres / Notities</th></tr>`;
+            projectStakeholders.forEach(sh => {
+                content += `<tr><td><strong>${sh.name}</strong></td><td>${sh.contactPerson || ''}</td><td>${sh.phone || ''}</td><td>${sh.email || ''}</td><td>${sh.address || ''} ${sh.contactNotes ? '<br><i>' + sh.contactNotes + '</i>' : ''}</td></tr>`;
+            });
+            content += `</table>`;
+
+            content += `<h2>7. Uitkomsten stakeholdergesprekken</h2>`;
+            projectStakeholders.forEach(sh => {
+                if(sh.includeInRemarks && sh.conversations && sh.conversations.length > 0) {
+                    let hasNotes = sh.conversations.some(c => c.notes.trim() !== '');
+                    if(hasNotes) {
+                        content += `<h3>${sh.name}</h3>`;
+                        sh.conversations.forEach((c, cIdx) => {
+                            content += `<p><strong>Gesprek ${cIdx+1} (${c.date}):</strong><br>${c.notes.replace(/\n/g, '<br>')}</p>`;
+                        });
+                    }
+                }
+            });
+
+            content += `<h2>8. Borging</h2>`;
+            content += `<p><strong>Opgesteld door:</strong> ${val('borging_door')}<br>`;
+            content += `<strong>Samen met:</strong> ${val('borging_met')}<br>`;
+            content += `<strong>Datum:</strong> ${val('borging_datum')}<br>`;
+            content += `<strong>Status:</strong> ${val('val_status')}</p></body></html>`;
+
+            const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+            const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(content);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Zwartewaterland_Omgevingsanalyse_' + (document.getElementById('project_subtitle').value || 'Project') + '.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportContactsToCSV() {
+            if (projectStakeholders.length === 0) {
+                alert("Er zijn geen contacten om te exporteren. Voeg eerst stakeholders toe in stap 2.");
+                return;
+            }
+
+            // CSV Header 
+            let csvContent = "Stakeholder;Contactpersoon;Telefoonnummer;E-mailadres;Adres;Notities\n";
+
+            projectStakeholders.forEach(sh => {
+                const escapeCSV = (str) => {
+                    if (!str) return '""';
+                    return '"' + String(str).replace(/"/g, '""') + '"';
+                };
+
+                const row = [
+                    escapeCSV(sh.name),
+                    escapeCSV(sh.contactPerson),
+                    escapeCSV(sh.phone),
+                    escapeCSV(sh.email),
+                    escapeCSV(sh.address),
+                    escapeCSV(sh.contactNotes)
+                ];
+                csvContent += row.join(";") + "\n";
+            });
+
+            const bom = "\uFEFF";
+            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            const projName = document.getElementById('project_subtitle').value || 'Project';
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Contactenlijst_${projName}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function prepareAndPrint() {
+            saveDataLocal(); 
+            try {
+                const projName = document.getElementById('project_subtitle').value;
+                document.getElementById('print-subtitle').innerText = projName || 'Concept versie';
+                document.getElementById('print-date').innerText = 'Gegenereerd op: ' + new Date().toLocaleDateString('nl-NL');
+
+                document.querySelectorAll('.print-replacement').forEach(e => e.remove());
+
+                document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(el => {
+                    const div = document.createElement('div');
+                    div.className = 'print-replacement text-sm';
+                    div.textContent = el.value;
+                    if(!el.value) div.innerHTML = '&nbsp;'; 
+                    el.parentNode.insertBefore(div, el.nextSibling);
+                });
+
+                document.querySelectorAll('select').forEach(el => {
+                    const div = document.createElement('div');
+                    div.className = 'print-replacement text-sm';
+                    const selected = el.options[el.selectedIndex];
+                    div.textContent = selected ? selected.text : '';
+                    el.parentNode.insertBefore(div, el.nextSibling);
+                });
+
+                setTimeout(() => { window.print(); }, 500);
+            } catch (e) {
+                alert("Kon de print-dialoog niet openen. Gebruik de toetsencombinatie in je browser.");
+            }
+        }
+
+        // --- SPECIFIEKE LOGICA ---
+
+        function addProjectStakeholderFromInputs() {
+            const nameInput = document.getElementById('new_sh_name');
+            const addrInput = document.getElementById('new_sh_address');
+            const name = nameInput.value;
+            const address = addrInput.value;
+
+            if(!name) { alert("Naam is verplicht."); return; }
+
+            if(address) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data && data.length > 0) addProjectStakeholder(name, address, data[0].lat, data[0].lon);
+                        else addProjectStakeholder(name, address);
+                    })
+                    .catch(err => addProjectStakeholder(name, address));
+            } else {
+                addProjectStakeholder(name);
+            }
+
+            nameInput.value = '';
+            addrInput.value = '';
+            nameInput.focus();
+        }
+
+        function addProjectStakeholder(name, address = "", lat = null, lon = null) {
+            if(name && name.trim() !== '') {
+                projectStakeholders.push({name: name.trim(), address: address, lat: lat, lon: lon, includeInRemarks: false});
+                setUnsavedChanges(true);
+                saveDataLocal();
+                renderProjectStakeholders(); renderIssues(); renderMatrixTable(); renderRemarks(); renderStrategyPerStakeholder(); renderContactenlijst(); updateMapMarkers();
+            }
+        }
+
+        function removeProjectStakeholder(index) {
+            projectStakeholders.splice(index, 1);
+            issuesData.forEach(issue => {
+                issue.linkedSh = issue.linkedSh.filter(idx => idx !== index);
+                issue.linkedSh = issue.linkedSh.map(idx => idx > index ? idx - 1 : idx);
+            });
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderProjectStakeholders(); renderIssues(); renderMatrixTable(); renderRemarks(); renderStrategyPerStakeholder(); renderContactenlijst(); updateMapMarkers();
+        }
+
+        let dragStartIndex;
+
+        function handleDragStart(e) {
+            dragStartIndex = +this.dataset.index;
+            this.classList.add('opacity-50', 'bg-gray-100');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('border-t-2', 'border-t-somOrange');
+        }
+        
+        function handleDragLeave(e) {
+            this.classList.remove('border-t-2', 'border-t-somOrange');
+        }
+        
+        function handleDrop(e) {
+            e.stopPropagation();
+            this.classList.remove('border-t-2', 'border-t-somOrange');
+            const dragEndIndex = +this.dataset.index;
+            reorderStakeholders(dragStartIndex, dragEndIndex);
+            return false;
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('opacity-50', 'bg-gray-100');
+            document.querySelectorAll('#list_sec2 li').forEach(li => {
+                li.classList.remove('border-t-2', 'border-t-somOrange');
+            });
+        }
+
+        function reorderStakeholders(oldIndex, newIndex) {
+            if (oldIndex === newIndex) return;
+
+            const movedItem = projectStakeholders.splice(oldIndex, 1)[0];
+            projectStakeholders.splice(newIndex, 0, movedItem);
+
+            const mapIndex = (oldIdx) => {
+                if (oldIndex < newIndex) {
+                    if (oldIdx === oldIndex) return newIndex;
+                    if (oldIdx > oldIndex && oldIdx <= newIndex) return oldIdx - 1;
+                    return oldIdx;
+                } else {
+                    if (oldIdx === oldIndex) return newIndex;
+                    if (oldIdx >= newIndex && oldIdx < oldIndex) return oldIdx + 1;
+                    return oldIdx;
+                }
+            };
+
+            issuesData.forEach(issue => {
+                if (issue.linkedSh) {
+                    issue.linkedSh = issue.linkedSh.map(idx => mapIndex(idx));
+                }
+            });
+
+            const newMatrixData = {};
+            for (const key in matrixData) {
+                const match = key.match(/p_(\d+)$/);
+                if (match) {
+                    const oldIdx = parseInt(match[1]);
+                    const newIdx = mapIndex(oldIdx);
+                    const newKey = key.replace(/p_\d+$/, `p_${newIdx}`);
+                    newMatrixData[newKey] = matrixData[key];
+                } else {
+                    newMatrixData[key] = matrixData[key];
+                }
+            }
+            matrixData = newMatrixData;
+
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderProjectStakeholders();
+            renderIssues();
+            renderMatrixTable();
+            renderRemarks();
+            renderStrategyPerStakeholder();
+            renderContactenlijst();
+            updateMapMarkers();
+        }
+
+        function renderProjectStakeholders() {
+            const list = document.getElementById('list_sec2');
+            if(list) {
+                list.innerHTML = '';
+                if(projectStakeholders.length === 0) list.innerHTML = '<li class="text-gray-400 italic p-2 text-center text-xs">Nog geen stakeholders.</li>';
+                else {
+                    projectStakeholders.forEach((sh, index) => {
+                        const li = document.createElement('li');
+                        li.className = "flex justify-between items-center group bg-white dark:bg-gray-800 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b border-gray-100 dark:border-gray-700 cursor-grab active:cursor-grabbing";
+                        
+                        li.draggable = true;
+                        li.dataset.index = index;
+                        li.addEventListener('dragstart', handleDragStart);
+                        li.addEventListener('dragover', handleDragOver);
+                        li.addEventListener('dragenter', handleDragEnter);
+                        li.addEventListener('dragleave', handleDragLeave);
+                        li.addEventListener('drop', handleDrop);
+                        li.addEventListener('dragend', handleDragEnd);
+
+                        const locIcon = sh.lat ? '📍' : '';
+                        li.innerHTML = `
+                            <div class="flex items-center overflow-hidden">
+                                <div class="text-gray-300 hover:text-gray-500 px-1 mr-2 no-print" title="Verslepen">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 3h2v2H4V3zm4 0h2v2H8V3zm-4 4h2v2H4V7zm4 0h2v2H8V7zm-4 4h2v2H4v-2zm4 0h2v2H8v-2z"/></svg>
+                                </div>
+                                <div class="flex flex-col overflow-hidden">
+                                    <span class="dark:text-gray-200 font-medium text-sm truncate select-none">${sh.name} ${locIcon}</span>
+                                    <span class="text-[10px] text-gray-500 truncate select-none">${sh.address || ''}</span>
+                                </div>
+                            </div>
+                            <button onclick="removeProjectStakeholder(${index})" class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity px-2 font-bold no-print text-xs z-10">✕</button>
+                        `;
+                        list.appendChild(li);
+                    });
+                }
+            }
+        }
+
+        function addIssue() { 
+            const title = `Issue ${issuesData.length + 1}`;
+            const newId = (issuesData.length > 0 ? Math.max(...issuesData.map(i => i.id)) : 0) + 1;
+            issuesData.push({id: newId, title: title.trim(), linkedSh: []});
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderIssues(); renderMatrixTable();
+        }
+        function removeIssue(idx) {
+            issuesData.splice(idx, 1);
+            setUnsavedChanges(true); saveDataLocal(); renderIssues(); renderMatrixTable();
+        }
+        function updateIssueTitle(idx, val) {
+            issuesData[idx].title = val;
+            setUnsavedChanges(true); saveDataLocal(); renderMatrixTable(); 
+        }
+        function toggleIssueLink(issueIdx, shIdx) {
+            const issue = issuesData[issueIdx];
+            if(issue.linkedSh.includes(shIdx)) issue.linkedSh = issue.linkedSh.filter(i => i !== shIdx); else issue.linkedSh.push(shIdx);
+            setUnsavedChanges(true); saveDataLocal(); renderMatrixTable();
+        }
+        
+        function renderIssues() {
+            const container = document.getElementById('issuesContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            issuesData.forEach((issue, idx) => {
+                let shOptions = '';
+                if(projectStakeholders.length === 0) shOptions = '<p class="text-xs text-gray-400 italic">Nog geen stakeholders beschikbaar.</p>';
+                else {
+                    projectStakeholders.forEach((sh, shIdx) => {
+                        const checked = issue.linkedSh && issue.linkedSh.includes(shIdx) ? 'checked' : '';
+                        shOptions += `<label class="inline-flex items-center mr-3 mb-1 cursor-pointer"><input type="checkbox" class="form-checkbox h-3 w-3 text-somOrange rounded" ${checked} onchange="toggleIssueLink(${idx}, ${shIdx})"><span class="ml-1 text-xs dark:text-gray-300">${sh.name}</span></label>`;
+                    });
+                }
+                const div = document.createElement('div');
+                div.className = "bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3 shadow-sm";
+                div.innerHTML = `<div class="flex justify-between items-center mb-2"><input type="text" value="${issue.title}" class="issue-title-input font-bold text-gray-800 dark:text-white bg-transparent border-b border-dashed border-gray-300 focus:outline-none focus:border-somOrange w-full mr-2" oninput="updateIssueTitle(${idx}, this.value)"><button onclick="removeIssue(${idx})" class="text-red-400 hover:text-red-600 text-xs no-print">✕</button></div><div class="bg-gray-50 dark:bg-gray-900/50 p-2 rounded"><span class="text-[10px] uppercase font-bold text-gray-400 block mb-1">betrokken stakeholder:</span><div class="flex flex-wrap">${shOptions}</div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function renderMatrixTable() {
+            const thead = document.getElementById('matrixHeadBasic');
+            const tbody = document.getElementById('matrixBodyBasic');
+            if(!thead || !tbody) return;
+            thead.innerHTML = ''; tbody.innerHTML = '';
+            
+            let headerHTML = `<tr><th class="p-3 border dark:border-gray-600 min-w-[150px] sticky left-0 bg-gray-50 dark:bg-gray-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Stakeholder</th>`;
+            issuesData.forEach(issue => { headerHTML += `<th class="p-3 border dark:border-gray-600 min-w-[150px] font-bold text-somBlue">${issue.title}</th>`; });
+            headerHTML += `<th class="p-3 border dark:border-gray-600 text-center w-[100px]">Verwacht<br>Belang</th><th class="p-3 border dark:border-gray-600 text-center w-[100px]">Verwachte<br>Spanning</th><th class="p-3 border dark:border-gray-600 min-w-[120px]">Strategie</th><th class="p-3 border dark:border-gray-600 min-w-[200px]">Opmerkingen</th></tr>`;
+            thead.innerHTML = headerHTML;
+
+            if(projectStakeholders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${issuesData.length + 5}" class="p-6 text-center text-gray-500 dark:text-gray-400 italic">Nog geen stakeholders. Voeg deze toe in stap 2.</td></tr>`;
+                return;
+            }
+
+            const buildRow = (sh, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "group bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750";
+                const uid = 'p_'+index;
+                const strategyKey = `m_strat_${uid}`;
+                const strategy = matrixData[strategyKey] || ''; 
+                
+                let groupOptionsHtml = `<option value="">-- Geen groep --</option>`;
+                if (stakeholderGroups && stakeholderGroups.length > 0) {
+                    stakeholderGroups.forEach(g => {
+                        const isSelected = (sh.groupId == g.id) ? 'selected' : '';
+                        groupOptionsHtml += `<option value="${g.id}" ${isSelected}>${g.name}</option>`;
+                    });
+                }
+
+                let rowHTML = `<td class="p-3 border dark:border-gray-600 align-top sticky left-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-750 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] min-w-[200px]">
+                    <div class="font-bold text-gray-800 dark:text-gray-200">${sh.name}</div>
+                    ${stakeholderGroups && stakeholderGroups.length > 0 ? `<select onchange="assignStakeholderGroup(${index}, this.value)" class="mt-2 text-[11px] w-full p-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 focus:outline-none focus:border-somBlue cursor-pointer">${groupOptionsHtml}</select>` : ''}
+                </td>`;
+                
+                const interestColor = matrixData[`m_int_${uid}`] || 'bg-gray-200';
+                const tensionColor = matrixData[`m_ten_${uid}`] || 'bg-gray-200';
+                
+                issuesData.forEach((issue) => {
+                    if (issue.linkedSh && issue.linkedSh.includes(index)) {
+                        rowHTML += `<td class="p-2 border dark:border-gray-600 bg-blue-50/60 dark:bg-blue-900/30 align-top"><textarea id="m_i${issue.id}_b_${uid}" placeholder="Vul in..." rows="1" class="w-full bg-white dark:bg-gray-800 border border-blue-300 dark:border-blue-600 rounded px-2 py-1 text-sm resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-somBlue" oninput="updateMatrixData(this.id, this.value); autoResize(this)"></textarea></td>`;
+                    } else {
+                        rowHTML += `<td class="p-2 border dark:border-gray-600 bg-gray-100 dark:bg-gray-800/80 align-middle text-center opacity-80"><span class="text-xs text-gray-400 italic select-none">Niet gekoppeld</span><textarea id="m_i${issue.id}_b_${uid}" class="hidden" oninput="updateMatrixData(this.id, this.value)"></textarea></td>`;
+                    }
+                });
+                
+                rowHTML += `<td class="p-3 border dark:border-gray-600 text-center align-top"><div id="m_int_${uid}" class="color-box mx-auto ${interestColor}" onclick="cycleInterestColor(this, '${uid}')"></div></td><td class="p-3 border dark:border-gray-600 text-center align-top"><div id="m_ten_${uid}" class="color-box mx-auto ${tensionColor}" onclick="cycleTensionColor(this, '${uid}')"></div></td><td class="p-2 border dark:border-gray-600 align-top"><select id="${strategyKey}" onchange="updateMatrixData('${strategyKey}', this.value)" class="w-full bg-transparent text-xs p-1 rounded"><option value="" disabled ${strategy===''?'selected':''}>Kies...</option><option value="Meebepalen" ${strategy==='Meebepalen'?'selected':''}>Meebepalen</option><option value="Meewerken" ${strategy==='Meewerken'?'selected':''}>Meewerken</option><option value="Meedenken" ${strategy==='Meedenken'?'selected':''}>Meedenken</option><option value="Meeweten" ${strategy==='Meeweten'?'selected':''}>Meeweten</option></select></td><td class="p-2 border dark:border-gray-600 align-top"><textarea id="m_notes_${uid}" placeholder="Notities..." class="w-full bg-transparent text-xs resize-none overflow-hidden border-none focus:ring-1 focus:ring-blue-500 p-1 rounded" rows="2" oninput="updateMatrixData(this.id, this.value); autoResize(this)"></textarea></td>`;
+                
+                tr.innerHTML = rowHTML;
+                return tr;
+            };
+
+            if (stakeholderGroups && stakeholderGroups.length > 0) {
+                stakeholderGroups.forEach(group => {
+                    const groupShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => item.sh.groupId == group.id);
+                    
+                    const trHeader = document.createElement('tr');
+                    trHeader.className = "bg-blue-50/80 dark:bg-blue-900/40 border-t-2 border-somBlue";
+                    trHeader.innerHTML = `
+                        <td colspan="${issuesData.length + 5}" class="p-3 border dark:border-gray-600 font-bold text-somDarkBlue dark:text-blue-300 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-base">📂 Groep: ${group.name}</span>
+                                <button onclick="removeStakeholderGroup(${group.id})" class="text-red-500 hover:text-red-700 text-[10px] no-print px-2 bg-white dark:bg-gray-800 rounded shadow-sm border border-red-100 dark:border-gray-700 py-1 uppercase tracking-wider font-bold transition">Verwijder groep</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(trHeader);
+
+                    groupShs.forEach(item => {
+                        tbody.appendChild(buildRow(item.sh, item.i));
+                    });
+                });
+
+                const ungroupedShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => !item.sh.groupId || !stakeholderGroups.find(g => g.id == item.sh.groupId));
+                if (ungroupedShs.length > 0) {
+                    const trHeader = document.createElement('tr');
+                    trHeader.className = "bg-gray-100 dark:bg-gray-800 border-t-2 border-gray-300 dark:border-gray-600";
+                    trHeader.innerHTML = `
+                        <td colspan="${issuesData.length + 5}" class="p-3 border dark:border-gray-600 font-bold text-gray-500 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            Ongroepeerd
+                        </td>
+                    `;
+                    tbody.appendChild(trHeader);
+                    ungroupedShs.forEach(item => {
+                        tbody.appendChild(buildRow(item.sh, item.i));
+                    });
+                }
+            } else {
+                projectStakeholders.forEach((sh, index) => {
+                    tbody.appendChild(buildRow(sh, index));
+                });
+            }
+            
+            for (const [key, val] of Object.entries(matrixData)) {
+                const input = document.getElementById(key);
+                if(input) input.value = val;
+            }
+        }
+
+        function addStakeholderGroup() {
+            const input = document.getElementById('new_group_name');
+            const name = input.value.trim();
+            if(!name) return;
+            const newId = stakeholderGroups.length > 0 ? Math.max(...stakeholderGroups.map(g => g.id)) + 1 : 1;
+            stakeholderGroups.push({id: newId, name: name});
+            input.value = '';
+            setUnsavedChanges(true); saveDataLocal(); renderMatrixTable();
+        }
+
+        function removeStakeholderGroup(id) {
+            showModal(
+                "Groep verwijderen", 
+                "Weet je zeker dat je deze groep wilt verwijderen? De stakeholders in deze groep blijven gewoon behouden (ze komen onder 'Ongroepeerd' te staan).",
+                function() {
+                    stakeholderGroups = stakeholderGroups.filter(g => g.id !== id);
+                    projectStakeholders.forEach(sh => {
+                        if(sh.groupId == id) sh.groupId = null;
+                    });
+                    setUnsavedChanges(true); 
+                    saveDataLocal(); 
+                    renderMatrixTable();
+                }
+            );
+        }
+
+        function assignStakeholderGroup(shIndex, groupId) {
+            projectStakeholders[shIndex].groupId = groupId ? parseInt(groupId) : null;
+            setUnsavedChanges(true); saveDataLocal(); renderMatrixTable();
+        }
+
+        function updateMatrixData(key, value) { 
+            matrixData[key] = value; 
+            setUnsavedChanges(true); saveDataLocal();
+            // Sync Strategie naar sectie 5
+            if(key.startsWith('m_strat_')) {
+                const s5 = document.getElementById(key + "_sec5");
+                if(s5 && s5.value !== value) s5.value = value;
+            }
+        }
+        
+        function cycleInterestColor(el, idx) {
+            const colors = ['bg-gray-200', 'bg-slate-400', 'bg-blue-200', 'bg-blue-400', 'bg-blue-600', 'bg-blue-800']; 
+            let current = el.className.split(' ').find(c => c.startsWith('bg-'));
+            // Vang een oude opgeslagen "Groot" (bg-blue-700) op en zet deze om naar het nieuwe kleurenpalet
+            if (current === 'bg-blue-700') current = 'bg-blue-600'; 
+            
+            let nextIndex = colors.indexOf(current) + 1;
+            let nextColor = colors[nextIndex % colors.length] || colors[0];
+            
+            el.className = `color-box mx-auto ${nextColor}`;
+            updateMatrixData(`m_int_${idx}`, nextColor);
+        }
+        function cycleTensionColor(el, idx) {
+            const colors = ['bg-gray-200', 'bg-slate-400', 'bg-green-400', 'bg-yellow-400', 'bg-orange-400', 'bg-red-600']; 
+            let current = el.className.split(' ').find(c => c.startsWith('bg-'));
+            
+            let nextIndex = colors.indexOf(current) + 1;
+            let nextColor = colors[nextIndex % colors.length] || colors[0];
+            
+            el.className = `color-box mx-auto ${nextColor}`;
+            updateMatrixData(`m_ten_${idx}`, nextColor);
+        }
+
+        function renderStrategyPerStakeholder() {
+            const container = document.getElementById('strategyPerStakeholderContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            projectStakeholders.forEach((sh, index) => {
+                const uid = 'p_' + index;
+                const strategyKey = `m_strat_${uid}`;
+                const strategy = matrixData[strategyKey] || '';
+                const div = document.createElement('div');
+                div.className = "bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm border-l-4 border-l-somDarkBlue flex flex-col";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <label class="font-bold text-gray-800 dark:text-gray-200">${sh.name}</label>
+                        <select id="${strategyKey}_sec5" onchange="updateMatrixData('${strategyKey}', this.value); document.getElementById('${strategyKey}').value = this.value;" class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 text-somDarkBlue dark:text-blue-300 font-bold text-xs rounded p-1">
+                            <option value="" disabled ${!strategy ? 'selected' : ''}>Kies...</option>
+                            <option value="Meebepalen" ${strategy==='Meebepalen'?'selected':''}>Meebepalen</option>
+                            <option value="Meewerken" ${strategy==='Meewerken'?'selected':''}>Meewerken</option>
+                            <option value="Meedenken" ${strategy==='Meedenken'?'selected':''}>Meedenken</option>
+                            <option value="Meeweten" ${strategy==='Meeweten'?'selected':''}>Meeweten</option>
+                        </select>
+                    </div>
+                    <textarea class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somDarkBlue focus:outline-none min-h-[80px] text-sm resize-none overflow-hidden" placeholder="Specifieke aanpak/strategie..." oninput="projectStakeholders[${index}].strategyText = this.value; setUnsavedChanges(true); saveDataLocal(); autoResize(this)">${sh.strategyText || ''}</textarea>
+                `;
+                container.appendChild(div);
+            });
+
+            setTimeout(() => {
+                container.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 10);
+        }
+
+        function toggleStakeholderRemarkVisibility(index) {
+            projectStakeholders[index].includeInRemarks = !projectStakeholders[index].includeInRemarks;
+            if (projectStakeholders[index].includeInRemarks && (!projectStakeholders[index].conversations || projectStakeholders[index].conversations.length === 0)) {
+                projectStakeholders[index].conversations = [{ date: '', notes: '' }];
+            }
+            setUnsavedChanges(true); saveDataLocal(); renderRemarks();
+        }
+
+        function renderRemarks() {
+            const container = document.getElementById('remarksContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const selectorDiv = document.createElement('div');
+            selectorDiv.className = "mb-8 p-4 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800/30 rounded-xl no-print";
+            selectorDiv.innerHTML = `<h4 class="font-bold text-sm text-somYellow dark:text-yellow-400 mb-3">☑️ Selecteer gespreksdeelnemers:</h4>`;
+            
+            const checklistDiv = document.createElement('div');
+            checklistDiv.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2";
+            projectStakeholders.forEach((sh, index) => {
+                const isChecked = sh.includeInRemarks ? 'checked' : '';
+                const label = document.createElement('label');
+                label.className = "flex items-center space-x-2 text-sm cursor-pointer hover:bg-white/60 dark:hover:bg-white/10 p-2 rounded transition-colors select-none";
+                label.innerHTML = `<input type="checkbox" class="form-checkbox text-somYellow rounded border-gray-300" ${isChecked} onchange="toggleStakeholderRemarkVisibility(${index})"><span class="dark:text-gray-300 truncate font-medium ${isChecked ? 'text-gray-800' : 'text-gray-500'}">${sh.name}</span>`;
+                checklistDiv.appendChild(label);
+            });
+            selectorDiv.appendChild(checklistDiv);
+            container.appendChild(selectorDiv);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = "space-y-6";
+            
+            projectStakeholders.forEach((sh, index) => {
+                if (!sh.includeInRemarks) return;
+                const shContainer = document.createElement('div');
+                shContainer.className = "bg-white dark:bg-gray-800 border rounded-xl p-5 shadow-sm border-t-4 border-t-somYellow group";
+                
+                let html = `
+                    <div class="flex flex-wrap justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-700 gap-2">
+                        <h3 class="font-bold text-gray-800 dark:text-white text-lg">💬 ${sh.name}</h3>
+                        <div class="flex items-center gap-2">
+                            <button onclick="projectStakeholders[${index}].conversations.push({date:'',notes:''}); setUnsavedChanges(true); saveDataLocal(); renderRemarks();" class="text-xs bg-somYellow text-white px-3 py-1.5 rounded-lg hover:bg-yellow-600 transition shadow-sm no-print">➕ Nieuw gesprek</button>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                `;
+
+                sh.conversations.forEach((conv, convIndex) => {
+                    html += `
+                        <div class="bg-yellow-50/50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-800/50 rounded-lg p-4 relative group/conv">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-somYellow bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded">Gesprek ${convIndex + 1}</span>
+                                <div class="flex items-center gap-2">
+                                    <input type="date" value="${conv.date}" class="text-sm border rounded px-2 py-1 bg-white dark:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-somYellow" oninput="projectStakeholders[${index}].conversations[${convIndex}].date = this.value; setUnsavedChanges(true); saveDataLocal();">
+                                    ${sh.conversations.length > 1 ? `<button onclick="showModal('Gesprek verwijderen', 'Weet je zeker dat je dit gesprek wilt verwijderen?', function() { projectStakeholders[${index}].conversations.splice(${convIndex}, 1); setUnsavedChanges(true); saveDataLocal(); renderRemarks(); })" class="text-red-400 hover:text-red-600 px-1 no-print" title="Verwijder gesprek">✕</button>` : ''}
+                                </div>
+                            </div>
+                            <textarea class="w-full p-3 border rounded dark:bg-gray-700 dark:border-gray-600 focus:ring-1 focus:ring-somYellow min-h-[80px] resize-none overflow-hidden" placeholder="Notities..." oninput="projectStakeholders[${index}].conversations[${convIndex}].notes = this.value; setUnsavedChanges(true); saveDataLocal(); autoResize(this)">${conv.notes}</textarea>
+                        </div>
+                    `;
+                });
+                shContainer.innerHTML = html + `</div>`;
+                contentDiv.appendChild(shContainer);
+            });
+            container.appendChild(contentDiv);
+
+            setTimeout(() => {
+                container.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 10);
+        }
+
+        function renderContactenlijst() {
+            const container = document.getElementById('contactenContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            if(projectStakeholders.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic text-sm">Nog geen stakeholders toegevoegd. Doe dit eerst in stap 2.</p>';
+                return;
+            }
+
+            const tableWrapper = document.createElement('div');
+            tableWrapper.className = "overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm";
+
+            const table = document.createElement('table');
+            table.className = "w-full text-sm text-left border-collapse min-w-[1000px]";
+
+            const thead = document.createElement('thead');
+            thead.className = "text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700";
+            thead.innerHTML = `
+                <tr>
+                    <th class="p-3 border-r dark:border-gray-600 sticky left-0 bg-gray-100 dark:bg-gray-800 z-10 w-1/5 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Stakeholder</th>
+                    <th class="p-3 border-r dark:border-gray-600 w-1/5">Contactpersoon</th>
+                    <th class="p-3 border-r dark:border-gray-600 w-1/6">Telefoonnummer</th>
+                    <th class="p-3 border-r dark:border-gray-600 w-1/5">E-mailadres</th>
+                    <th class="p-3 w-1/4">Adres / Notities</th>
+                </tr>
+            `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            tbody.className = "dark:text-gray-200 divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900";
+
+            projectStakeholders.forEach((sh, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-purple-50 dark:hover:bg-gray-800 transition-colors";
+
+                tr.innerHTML = `
+                    <td class="p-3 border-r dark:border-gray-700 align-top sticky left-0 bg-white dark:bg-gray-900 group-hover:bg-purple-50 dark:group-hover:bg-gray-800 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                        <div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${sh.name}">${sh.name}</div>
+                        <div class="text-[10px] text-gray-500 truncate mt-1" title="${sh.address || ''}">${sh.address || 'Geen locatie'}</div>
+                    </td>
+                    <td class="p-0 border-r dark:border-gray-700 align-top relative">
+                        <input type="text" placeholder="Contactpersoon..." class="absolute inset-0 w-full h-full px-3 py-2 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-purple-500 focus:outline-none focus:bg-white dark:focus:bg-gray-700 text-sm" value="${sh.contactPerson || ''}" oninput="projectStakeholders[${index}].contactPerson = this.value; setUnsavedChanges(true); saveDataLocal();">
+                    </td>
+                    <td class="p-0 border-r dark:border-gray-700 align-top relative">
+                        <input type="text" placeholder="06-12345678" class="absolute inset-0 w-full h-full px-3 py-2 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-purple-500 focus:outline-none focus:bg-white dark:focus:bg-gray-700 text-sm" value="${sh.phone || ''}" oninput="projectStakeholders[${index}].phone = this.value; setUnsavedChanges(true); saveDataLocal();">
+                    </td>
+                    <td class="p-0 border-r dark:border-gray-700 align-top relative">
+                        <input type="email" placeholder="naam@domein.nl" class="absolute inset-0 w-full h-full px-3 py-2 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-purple-500 focus:outline-none focus:bg-white dark:focus:bg-gray-700 text-sm" value="${sh.email || ''}" oninput="projectStakeholders[${index}].email = this.value; setUnsavedChanges(true); saveDataLocal();">
+                    </td>
+                    <td class="p-0 align-top relative">
+                        <input type="text" placeholder="Notities..." class="absolute inset-0 w-full h-full px-3 py-2 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-purple-500 focus:outline-none focus:bg-white dark:focus:bg-gray-700 text-sm" value="${sh.contactNotes || ''}" oninput="projectStakeholders[${index}].contactNotes = this.value; setUnsavedChanges(true); saveDataLocal();">
+                    </td>
+                `;
+                const cells = tr.querySelectorAll('td');
+                cells.forEach(td => td.style.minHeight = '48px');
+                tr.style.height = '48px';
+
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(tbody);
+            tableWrapper.appendChild(table);
+            container.appendChild(tableWrapper);
+        }
+
+        // --- MAP FUNCTIONS ---
+        function initMap() {
+            if(map) return;
+            map = L.map('map-container').setView([52.5, 5.5], 7);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+            updateMapMarkers();
+        }
+
+        function updateMapMarkers() {
+            if(!map) return;
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+            let bounds = L.latLngBounds();
+            let hasPoints = false;
+
+            projectStakeholders.forEach(sh => {
+                if(sh.lat && sh.lon) {
+                    const marker = L.marker([sh.lat, sh.lon]).addTo(map);
+                    marker.bindPopup(`<b>${sh.name}</b><br>${sh.address || ''}`);
+                    markers.push(marker);
+                    bounds.extend([sh.lat, sh.lon]);
+                    hasPoints = true;
+                }
+            });
+            if(hasPoints) map.fitBounds(bounds, {padding: [50, 50]});
+        }
+    </script>
+</body>
+</html>
