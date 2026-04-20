@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -389,67 +389,47 @@
                                     <div class="flex justify-between items-center mb-2 group">
                                         <label class="font-bold text-gray-700 dark:text-gray-200 block">Wat is de opgave?</label>
                                         <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeeld:</strong> Het vervangen van de riolering...
+                                        <div class="absolute right-0 top-8 w-80 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeldvragen:</strong>
+                                            <ul class="list-disc list-inside mt-1 space-y-1">
+                                                <li>Wat is de opgave waarvoor we aan de lat staan?</li>
+                                                <li>Wat is het probleem?</li>
+                                                <li>Wat is de scope van de opgave? Denk aan fysiek, functioneel, juridisch, infrastructuur etc.</li>
+                                                <li>Welke inhoudelijke doelen stellen we?</li>
+                                            </ul>
                                         </div>
                                     </div>
                                     <textarea id="input_opgave_1" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Omschrijf concreet (bv. riolering vervangen)..." oninput="autoResize(this)"></textarea>
                                 </div>
                                 <div class="relative">
                                     <div class="flex justify-between items-center mb-2 group">
-                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Wat is het doel?</label>
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Doel omgevingsmanagement</label>
                                         <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeeld:</strong> Een klimaatbestendige wijk...
-                                        </div>
-                                    </div>
-                                    <textarea id="input_opgave_2" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Resultaat (bv. klimaatbestendige wijk)..." oninput="autoResize(this)"></textarea>
-                                </div>
-                                <div class="relative">
-                                    <div class="flex justify-between items-center mb-2 group">
-                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Waarom (nu) nodig?</label>
-                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeeld:</strong> Huidige riolering is 60 jaar oud...
-                                        </div>
-                                    </div>
-                                    <textarea id="input_opgave_3" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Urgentie (bv. 60 jaar oud)..." oninput="autoResize(this)"></textarea>
-                                </div>
-                                <div class="relative">
-                                    <div class="flex justify-between items-center mb-2 group">
-                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Impact omgeving?</label>
-                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-72 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeelden:</strong>
+                                        <div class="absolute right-0 top-8 w-80 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeldvragen:</strong>
                                             <ul class="list-disc list-inside mt-1 space-y-1">
-                                                <li><strong>Verkeer:</strong> Omleidingen, parkeerdruk, bevoorrading winkels?</li>
-                                                <li><strong>Veiligheid:</strong> Schoolroutes, bereikbaarheid hulpdiensten?</li>
-                                                <li><strong>Events:</strong> Kermis, weekmarkt, sportwedstrijden?</li>
-                                                <li><strong>Fysiek:</strong> Trillingen, geluid, stof, grondwaterstand?</li>
+                                                <li>Op welke wijze kan het omgevingsproces bijdragen aan het duurzaam realiseren van de opgave?</li>
+                                                <li>Wat willen we bereiken met het omgevingsmanagement?</li>
+                                                <li>Welke rol en verantwoordelijkheid hebben wij ten aanzien van het omgevingsmanagement?</li>
                                             </ul>
                                         </div>
                                     </div>
-                                    <textarea id="input_opgave_4" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Hinder/Verandering..." oninput="autoResize(this)"></textarea>
+                                    <textarea id="input_opgave_2" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Wat willen we bereiken met omgevingsmanagement..." oninput="autoResize(this)"></textarea>
                                 </div>
                                 <div class="relative">
                                     <div class="flex justify-between items-center mb-2 group">
-                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Omgevingsrisico's</label>
+                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Context</label>
                                         <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeeld:</strong> Bedreigingen voor voortgang/draagvlak? (bv. bezwaar, negatieve media)
+                                        <div class="absolute right-0 top-8 w-80 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                            <strong>Voorbeeldvragen:</strong>
+                                            <ul class="list-disc list-inside mt-1 space-y-1">
+                                                <li>Wat zijn de ervaringen in deze omgeving?</li>
+                                                <li>Wat zijn de kenmerken van de omgeving?</li>
+                                                <li>Zijn er specifieke (wetgevende) kaders waarmee rekening moet worden gehouden?</li>
+                                            </ul>
                                         </div>
                                     </div>
-                                    <textarea id="input_opgave_5" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Bedreigingen (bezwaar, media)..." oninput="autoResize(this)"></textarea>
-                                </div>
-                                <div class="relative">
-                                    <div class="flex justify-between items-center mb-2 group">
-                                        <label class="font-bold text-gray-700 dark:text-gray-200 block">Omgevingskansen</label>
-                                        <span class="text-red-500 cursor-help no-print transition-transform hover:scale-110">❓</span>
-                                        <div class="absolute right-0 top-8 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                            <strong>Voorbeeld:</strong> Mogelijkheden voor meerwaarde? (bv. meekoppelkansen, inwonersinitiatief)
-                                        </div>
-                                    </div>
-                                    <textarea id="input_opgave_6" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Meerwaarde (meekoppelkansen)..." oninput="autoResize(this)"></textarea>
+                                    <textarea id="input_context" rows="3" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-somBlue focus:outline-none resize-none overflow-hidden" placeholder="Beschrijf de context..." oninput="autoResize(this)"></textarea>
                                 </div>
                             </div>
                             
@@ -469,7 +449,7 @@
                                 <span class="w-8 h-8 rounded-full bg-somOrange text-white flex items-center justify-center text-sm mr-3 print:hidden">2</span>
                                 <span class="print:mr-2">2.</span> Inventarisatie issues & stakeholders
                             </h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Bepaal de issues en koppel hier stakeholders aan.</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Bepaal de issues en koppel hier stakeholders aan. Een issue is een kwestie waarover discussie/meningsverschil is of kan ontstaan tussen partijen, of waar spanning op zit of kan ontstaan. Stakeholders zijn iedereen met een belang bij de opgave/het project en de issues die daarbij horen.</p>
                         </div>
                         
                         <div class="p-6 md:p-8">
@@ -713,7 +693,6 @@
                         
                         <div class="p-6 md:p-8">
                             <div class="mb-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                <p class="font-medium text-somBlue dark:text-blue-400 mb-2">Wat is op basis van de stakeholders en de belangen het voorlopige participatieniveau en hoe willen we daar invulling aan geven? Geef hier aan wat de omgevingsgerichte aanpak wordt.</p>
                                 <p class="italic text-gray-500 dark:text-gray-400">Vertaal de issues en stakeholders naar een overzichtelijke matrix. Vul per stakeholder het verwachte belang in bij elk issue, en geef ook de verwachte spanning aan. Dit dient later gevalideerd te worden in de stakeholdergesprekken.</p>
                             </div>
 
@@ -752,7 +731,6 @@
                                 <span class="w-8 h-8 rounded-full bg-somDarkBlue text-white flex items-center justify-center text-sm mr-3 print:hidden">5</span>
                                 <span class="print:mr-2">5.</span> Strategie: Wat is onze aanpak?
                             </h2>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-11 italic">Wat is op basis van de stakeholders en de belangen het voorlopige participatieniveau en hoe willen we daar invulling aan geven? Geef hier aan wat de omgevingsgerichte aanpak wordt.</p>
                         </div>
                         
                         <div class="p-6 md:p-8">
@@ -1171,6 +1149,16 @@
                         sh.conversations.push({ date: sh.conversationDate || '', notes: sh.remarks || '' });
                         delete sh.remarks; delete sh.conversationDate;
                     }
+                    // Migratie voor bestaande projecten: groupId omzetten naar groupIds array
+                    if (sh.groupId !== undefined) {
+                        if (sh.groupId !== null) {
+                            sh.groupIds = [sh.groupId];
+                        } else {
+                            sh.groupIds = [];
+                        }
+                        delete sh.groupId;
+                    }
+                    if (!sh.groupIds) sh.groupIds = [];
                 });
             }
             if(data.stakeholderGroups) stakeholderGroups = JSON.parse(data.stakeholderGroups);
@@ -1419,11 +1407,8 @@
 
             content += `<h2>1. Opgave bepalen</h2>`;
             content += `<strong>Wat is de opgave?</strong><br><p>${val('input_opgave_1')}</p>`;
-            content += `<strong>Wat is het doel?</strong><br><p>${val('input_opgave_2')}</p>`;
-            content += `<strong>Waarom (nu) nodig?</strong><br><p>${val('input_opgave_3')}</p>`;
-            content += `<strong>Impact omgeving?</strong><br><p>${val('input_opgave_4')}</p>`;
-            content += `<strong>Omgevingsrisico's:</strong><br><p>${val('input_opgave_5')}</p>`;
-            content += `<strong>Omgevingskansen:</strong><br><p>${val('input_opgave_6')}</p>`;
+            content += `<strong>Doel omgevingsmanagement:</strong><br><p>${val('input_opgave_2')}</p>`;
+            content += `<strong>Context:</strong><br><p>${val('input_context')}</p>`;
 
             content += `<h2>2. Issues & Stakeholders</h2>`;
             content += `<h3>Issues</h3><ul>`;
@@ -1497,14 +1482,14 @@
                 stakeholderGroups.forEach(group => {
                     content += `<tr><td colspan="${issuesData.length + 5}" style="background-color: #DBEAFE;"><strong>📂 Groep: ${group.name}</strong></td></tr>`;
                     projectStakeholders.forEach((sh, idx) => {
-                        if (sh.groupId == group.id) content += renderExportRow(sh, idx);
+                        if (sh.groupIds && sh.groupIds.includes(group.id)) content += renderExportRow(sh, idx);
                     });
                 });
-                const ungrouped = projectStakeholders.filter(sh => !sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId));
+                const ungrouped = projectStakeholders.filter(sh => !sh.groupIds || sh.groupIds.length === 0);
                 if (ungrouped.length > 0) {
                     content += `<tr><td colspan="${issuesData.length + 5}" style="background-color: #F3F4F6;"><strong>Ongroepeerd</strong></td></tr>`;
                     projectStakeholders.forEach((sh, idx) => {
-                        if (!sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId)) content += renderExportRow(sh, idx);
+                        if (!sh.groupIds || sh.groupIds.length === 0) content += renderExportRow(sh, idx);
                     });
                 }
             } else {
@@ -1634,14 +1619,14 @@
                 stakeholderGroups.forEach(group => {
                     content += `<tr><td colspan="${issuesData.length + 5}" class="group-header">📂 Groep: ${group.name}</td></tr>`;
                     projectStakeholders.forEach((sh, idx) => {
-                        if (sh.groupId == group.id) content += renderRow(sh, idx);
+                        if (sh.groupIds && sh.groupIds.includes(group.id)) content += renderRow(sh, idx);
                     });
                 });
-                const ungrouped = projectStakeholders.filter(sh => !sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId));
+                const ungrouped = projectStakeholders.filter(sh => !sh.groupIds || sh.groupIds.length === 0);
                 if (ungrouped.length > 0) {
                     content += `<tr><td colspan="${issuesData.length + 5}" class="ungrouped-header">Ongroepeerd</td></tr>`;
                     projectStakeholders.forEach((sh, idx) => {
-                        if (!sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId)) content += renderRow(sh, idx);
+                        if (!sh.groupIds || sh.groupIds.length === 0) content += renderRow(sh, idx);
                     });
                 }
             } else {
@@ -1831,10 +1816,10 @@
                     groupRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
                     
                     projectStakeholders.forEach((sh, idx) => {
-                        if (sh.groupId == group.id) addStakeholderRow(sh, idx, group.name);
+                        if (sh.groupIds && sh.groupIds.includes(group.id)) addStakeholderRow(sh, idx, group.name);
                     });
                 });
-                const ungrouped = projectStakeholders.filter(sh => !sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId));
+                const ungrouped = projectStakeholders.filter(sh => !sh.groupIds || sh.groupIds.length === 0);
                 if (ungrouped.length > 0) {
                     const groupRow = ws.addRow(["Ongroepeerd"]);
                     ws.mergeCells(groupRow.number, 1, groupRow.number, headers.length);
@@ -1842,7 +1827,7 @@
                     groupRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF3F4F6' } };
                     
                     projectStakeholders.forEach((sh, idx) => {
-                        if (!sh.groupId || !stakeholderGroups.find(g => g.id == sh.groupId)) addStakeholderRow(sh, idx, "Ongroepeerd");
+                        if (!sh.groupIds || sh.groupIds.length === 0) addStakeholderRow(sh, idx, "Ongroepeerd");
                     });
                 }
             } else {
@@ -1895,11 +1880,8 @@
             ws1.columns = [{ width: 25 }, { width: 100 }];
             styleBasicRow(ws1.addRow(["Onderdeel", "Inhoud"]), true);
             styleBasicRow(ws1.addRow(["Wat is de opgave?", val('input_opgave_1')]));
-            styleBasicRow(ws1.addRow(["Wat is het doel?", val('input_opgave_2')]));
-            styleBasicRow(ws1.addRow(["Waarom (nu) nodig?", val('input_opgave_3')]));
-            styleBasicRow(ws1.addRow(["Impact omgeving?", val('input_opgave_4')]));
-            styleBasicRow(ws1.addRow(["Omgevingsrisico's", val('input_opgave_5')]));
-            styleBasicRow(ws1.addRow(["Omgevingskansen", val('input_opgave_6')]));
+            styleBasicRow(ws1.addRow(["Doel omgevingsmanagement", val('input_opgave_2')]));
+            styleBasicRow(ws1.addRow(["Context", val('input_context')]));
 
             // 2. Issues & Stakeholders
             const ws2 = wb.addWorksheet("2. Issues & Stakeholders");
@@ -2055,7 +2037,7 @@
 
         function addProjectStakeholder(name, address = "", lat = null, lon = null) {
             if(name && name.trim() !== '') {
-                projectStakeholders.push({name: name.trim(), address: address, lat: lat, lon: lon, includeInRemarks: false});
+                projectStakeholders.push({name: name.trim(), address: address, lat: lat, lon: lon, includeInRemarks: false, groupIds: []});
                 setUnsavedChanges(true);
                 saveDataLocal();
                 renderProjectStakeholders(); renderIssues(); renderMatrixTable(); renderRemarks(); renderStrategyPerStakeholder(); renderContactenlijst(); updateMapMarkers();
@@ -2262,17 +2244,24 @@
                 const strategyKey = `m_strat_${uid}`;
                 const strategy = matrixData[strategyKey] || ''; 
                 
-                let groupOptionsHtml = `<option value="">-- Geen groep --</option>`;
+                let groupOptionsHtml = '';
                 if (stakeholderGroups && stakeholderGroups.length > 0) {
+                    groupOptionsHtml = `<div class="mt-2 max-h-24 overflow-y-auto bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded p-1.5 scrollbar-thin">`;
+                    groupOptionsHtml += `<div class="text-[10px] uppercase font-bold text-gray-400 mb-1">Zit in stakeholdergroep:</div>`;
                     stakeholderGroups.forEach(g => {
-                        const isSelected = (sh.groupId == g.id) ? 'selected' : '';
-                        groupOptionsHtml += `<option value="${g.id}" ${isSelected}>${g.name}</option>`;
+                        const isSelected = (sh.groupIds && sh.groupIds.includes(g.id)) ? 'checked' : '';
+                        groupOptionsHtml += `
+                        <label class="flex items-center space-x-1.5 text-[11px] mb-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 p-0.5 rounded transition-colors">
+                            <input type="checkbox" ${isSelected} onchange="toggleStakeholderGroup(${index}, ${g.id})" class="form-checkbox h-3 w-3 rounded text-somBlue border-gray-300 bg-white">
+                            <span class="truncate text-gray-700 dark:text-gray-300" title="${g.name}">${g.name}</span>
+                        </label>`;
                     });
+                    groupOptionsHtml += `</div>`;
                 }
 
                 let rowHTML = `<td class="p-3 border dark:border-gray-600 align-top sticky left-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-750 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] min-w-[200px]">
                     <div class="font-bold text-gray-800 dark:text-gray-200">${sh.name}</div>
-                    ${stakeholderGroups && stakeholderGroups.length > 0 ? `<select onchange="assignStakeholderGroup(${index}, this.value)" class="mt-2 text-[11px] w-full p-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 focus:outline-none focus:border-somBlue cursor-pointer">${groupOptionsHtml}</select>` : ''}
+                    ${groupOptionsHtml}
                 </td>`;
                 
                 const interestColor = matrixData[`m_int_${uid}`] || 'bg-gray-200';
@@ -2294,7 +2283,7 @@
 
             if (stakeholderGroups && stakeholderGroups.length > 0) {
                 stakeholderGroups.forEach(group => {
-                    const groupShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => item.sh.groupId == group.id);
+                    const groupShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => item.sh.groupIds && item.sh.groupIds.includes(group.id));
                     
                     const trHeader = document.createElement('tr');
                     trHeader.className = "bg-blue-50/80 dark:bg-blue-900/40 border-t-2 border-somBlue";
@@ -2313,7 +2302,7 @@
                     });
                 });
 
-                const ungroupedShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => !item.sh.groupId || !stakeholderGroups.find(g => g.id == item.sh.groupId));
+                const ungroupedShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => !item.sh.groupIds || item.sh.groupIds.length === 0);
                 if (ungroupedShs.length > 0) {
                     const trHeader = document.createElement('tr');
                     trHeader.className = "bg-gray-100 dark:bg-gray-800 border-t-2 border-gray-300 dark:border-gray-600";
@@ -2352,11 +2341,11 @@
         function removeStakeholderGroup(id) {
             showModal(
                 "Groep verwijderen", 
-                "Weet je zeker dat je deze groep wilt verwijderen? De stakeholders in deze groep blijven gewoon behouden (ze komen onder 'Ongroepeerd' te staan).",
+                "Weet je zeker dat je deze groep wilt verwijderen? De stakeholders blijven behouden, ze worden alleen uit deze groep gehaald.",
                 function() {
                     stakeholderGroups = stakeholderGroups.filter(g => g.id !== id);
                     projectStakeholders.forEach(sh => {
-                        if(sh.groupId == id) sh.groupId = null;
+                        if(sh.groupIds) sh.groupIds = sh.groupIds.filter(gid => gid !== id);
                     });
                     setUnsavedChanges(true); 
                     saveDataLocal(); 
@@ -2365,8 +2354,14 @@
             );
         }
 
-        function assignStakeholderGroup(shIndex, groupId) {
-            projectStakeholders[shIndex].groupId = groupId ? parseInt(groupId) : null;
+        function toggleStakeholderGroup(shIndex, groupId) {
+            let sh = projectStakeholders[shIndex];
+            if (!sh.groupIds) sh.groupIds = [];
+            if (sh.groupIds.includes(groupId)) {
+                sh.groupIds = sh.groupIds.filter(id => id !== groupId);
+            } else {
+                sh.groupIds.push(groupId);
+            }
             setUnsavedChanges(true); saveDataLocal(); renderMatrixTable();
         }
 
