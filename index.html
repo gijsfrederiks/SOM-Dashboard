@@ -2056,6 +2056,7 @@
         }
 
         let dragStartIndex;
+        let dragStartIssueIndex;
 
         function handleDragStart(e) {
             dragStartIndex = +this.dataset.index;
@@ -2141,6 +2142,58 @@
             updateMapMarkers();
         }
 
+        // --- Drag and Drop handlers for Issues ---
+        function handleIssueDragStart(e) {
+            dragStartIssueIndex = +this.dataset.index;
+            this.classList.add('opacity-50', 'bg-gray-100', 'dark:bg-gray-700');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleIssueDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleIssueDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('border-t-2', 'border-t-somOrange');
+        }
+
+        function handleIssueDragLeave(e) {
+            this.classList.remove('border-t-2', 'border-t-somOrange');
+        }
+
+        function handleIssueDrop(e) {
+            e.stopPropagation();
+            this.classList.remove('border-t-2', 'border-t-somOrange');
+            const dragEndIndex = +this.dataset.index;
+            reorderIssues(dragStartIssueIndex, dragEndIndex);
+            return false;
+        }
+
+        function handleIssueDragEnd(e) {
+            this.classList.remove('opacity-50', 'bg-gray-100', 'dark:bg-gray-700');
+            document.querySelectorAll('#issuesContainer > div').forEach(div => {
+                div.classList.remove('border-t-2', 'border-t-somOrange');
+            });
+        }
+
+        function reorderIssues(oldIndex, newIndex) {
+            if (oldIndex === newIndex) return;
+            const movedItem = issuesData.splice(oldIndex, 1)[0];
+            issuesData.splice(newIndex, 0, movedItem);
+            
+            // Note: matrixData verhuist niet fysiek mee qua key-namen omdat deze gebaseerd 
+            // zijn op 'issue.id' (bijv. m_i1_b_p_0) en niet de array index!
+            // Dit betekent dat simpelweg de array herordenen volkomen veilig is en 
+            // alles overal netjes meebeweegt.
+
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderIssues();
+            renderMatrixTable();
+        }
+
         function renderProjectStakeholders() {
             const list = document.getElementById('list_sec2');
             if(list) {
@@ -2214,9 +2267,34 @@
                         shOptions += `<label class="inline-flex items-center mr-3 mb-1 cursor-pointer"><input type="checkbox" class="form-checkbox h-3 w-3 text-somOrange rounded" ${checked} onchange="toggleIssueLink(${idx}, ${shIdx})"><span class="ml-1 text-xs dark:text-gray-300">${sh.name}</span></label>`;
                     });
                 }
+                
                 const div = document.createElement('div');
-                div.className = "bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3 shadow-sm";
-                div.innerHTML = `<div class="flex justify-between items-center mb-2"><input type="text" value="${issue.title}" class="issue-title-input font-bold text-gray-800 dark:text-white bg-transparent border-b border-dashed border-gray-300 focus:outline-none focus:border-somOrange w-full mr-2" oninput="updateIssueTitle(${idx}, this.value)"><button onclick="removeIssue(${idx})" class="text-red-400 hover:text-red-600 text-xs no-print">✕</button></div><div class="bg-gray-50 dark:bg-gray-900/50 p-2 rounded"><span class="text-[10px] uppercase font-bold text-gray-400 block mb-1">betrokken stakeholder:</span><div class="flex flex-wrap">${shOptions}</div></div>`;
+                div.className = "bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-3 shadow-sm transition";
+                
+                // Drag and Drop instellen
+                div.draggable = true;
+                div.dataset.index = idx;
+                div.addEventListener('dragstart', handleIssueDragStart);
+                div.addEventListener('dragover', handleIssueDragOver);
+                div.addEventListener('dragenter', handleIssueDragEnter);
+                div.addEventListener('dragleave', handleIssueDragLeave);
+                div.addEventListener('drop', handleIssueDrop);
+                div.addEventListener('dragend', handleIssueDragEnd);
+
+                // Note: onmouseenter/onmouseleave zorgt ervoor dat het textveld gebruikt kan worden zonder perongeluk te draggen.
+                div.innerHTML = `
+                    <div class="flex items-center mb-2 w-full">
+                        <div class="text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing mr-2 no-print" title="Verslepen">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 3h2v2H4V3zm4 0h2v2H8V3zm-4 4h2v2H4V7zm4 0h2v2H8V7zm-4 4h2v2H4v-2zm4 0h2v2H8v-2z"/></svg>
+                        </div>
+                        <input type="text" value="${issue.title}" class="issue-title-input font-bold text-gray-800 dark:text-white bg-transparent border-b border-dashed border-gray-300 focus:outline-none focus:border-somOrange w-full mr-2" oninput="updateIssueTitle(${idx}, this.value)" onmouseenter="this.closest('div[data-index]').setAttribute('draggable', 'false')" onmouseleave="this.closest('div[data-index]').setAttribute('draggable', 'true')" onfocus="this.closest('div[data-index]').setAttribute('draggable', 'false')" onblur="this.closest('div[data-index]').setAttribute('draggable', 'true')">
+                        <button onclick="removeIssue(${idx})" class="text-red-400 hover:text-red-600 text-xs no-print ml-auto px-1 py-1">✕</button>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-900/50 p-2 rounded" onmouseenter="this.closest('div[data-index]').setAttribute('draggable', 'false')" onmouseleave="this.closest('div[data-index]').setAttribute('draggable', 'true')">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 block mb-1">betrokken stakeholder:</span>
+                        <div class="flex flex-wrap">${shOptions}</div>
+                    </div>
+                `;
                 container.appendChild(div);
             });
         }
