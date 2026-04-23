@@ -1885,6 +1885,58 @@
             renderMatrixTable();
         }
 
+        // --- Drag and Drop handlers for Groups ---
+        let dragStartGroupIndex;
+
+        function handleGroupDragStart(e) {
+            dragStartGroupIndex = +this.dataset.gindex;
+            this.classList.add('opacity-50');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleGroupDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleGroupDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('border-t-4', 'border-somOrange');
+            this.classList.remove('border-somBlue');
+        }
+
+        function handleGroupDragLeave(e) {
+            this.classList.remove('border-t-4', 'border-somOrange');
+            this.classList.add('border-somBlue');
+        }
+
+        function handleGroupDrop(e) {
+            e.stopPropagation();
+            this.classList.remove('border-t-4', 'border-somOrange');
+            this.classList.add('border-somBlue');
+            const dragEndIndex = +this.dataset.gindex;
+            reorderStakeholderGroups(dragStartGroupIndex, dragEndIndex);
+            return false;
+        }
+
+        function handleGroupDragEnd(e) {
+            this.classList.remove('opacity-50');
+            document.querySelectorAll('.group-header-row').forEach(row => {
+                row.classList.remove('border-t-4', 'border-somOrange');
+                row.classList.add('border-somBlue');
+            });
+        }
+
+        function reorderStakeholderGroups(oldIndex, newIndex) {
+            if (oldIndex === newIndex) return;
+            const movedItem = stakeholderGroups.splice(oldIndex, 1)[0];
+            stakeholderGroups.splice(newIndex, 0, movedItem);
+
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderMatrixTable();
+        }
+
         function renderProjectStakeholders() {
             const list = document.getElementById('list_sec2');
             if(list) {
@@ -2055,16 +2107,31 @@
             };
 
             if (stakeholderGroups && stakeholderGroups.length > 0) {
-                stakeholderGroups.forEach(group => {
+                stakeholderGroups.forEach((group, gIndex) => {
                     const groupShs = projectStakeholders.map((sh, i) => ({sh, i})).filter(item => item.sh.groupIds && item.sh.groupIds.includes(group.id));
                     
                     const trHeader = document.createElement('tr');
-                    trHeader.className = "bg-blue-50/80 dark:bg-blue-900/40 border-t-2 border-somBlue";
+                    trHeader.className = "bg-blue-50/80 dark:bg-blue-900/40 border-t-2 border-somBlue group-header-row transition-all";
+                    
+                    trHeader.draggable = true;
+                    trHeader.dataset.gindex = gIndex;
+                    trHeader.addEventListener('dragstart', handleGroupDragStart);
+                    trHeader.addEventListener('dragover', handleGroupDragOver);
+                    trHeader.addEventListener('dragenter', handleGroupDragEnter);
+                    trHeader.addEventListener('dragleave', handleGroupDragLeave);
+                    trHeader.addEventListener('drop', handleGroupDrop);
+                    trHeader.addEventListener('dragend', handleGroupDragEnd);
+
                     trHeader.innerHTML = `
                         <td colspan="${issuesData.length + 5}" class="p-3 border dark:border-gray-600 font-bold text-somDarkBlue dark:text-blue-300 sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             <div class="flex justify-between items-center">
-                                <span class="text-base">📂 Groep: ${group.name}</span>
-                                <button onclick="removeStakeholderGroup(${group.id})" class="text-red-500 hover:text-red-700 text-[10px] no-print px-2 bg-white dark:bg-gray-800 rounded shadow-sm border border-red-100 dark:border-gray-700 py-1 uppercase tracking-wider font-bold transition">Verwijder groep</button>
+                                <div class="flex items-center">
+                                    <div class="text-somBlue hover:text-somDarkBlue mr-3 cursor-grab active:cursor-grabbing no-print" title="Versleep groep">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 3h2v2H4V3zm4 0h2v2H8V3zm-4 4h2v2H4V7zm4 0h2v2H8V7zm-4 4h2v2H4v-2zm4 0h2v2H8v-2z"/></svg>
+                                    </div>
+                                    <span class="text-base select-none">📂 Groep: ${group.name}</span>
+                                </div>
+                                <button onclick="removeStakeholderGroup(${group.id})" class="text-red-500 hover:text-red-700 text-[10px] no-print px-2 bg-white dark:bg-gray-800 rounded shadow-sm border border-red-100 dark:border-gray-700 py-1 uppercase tracking-wider font-bold transition" onmouseenter="this.closest('tr').setAttribute('draggable', 'false')" onmouseleave="this.closest('tr').setAttribute('draggable', 'true')">Verwijder groep</button>
                             </div>
                         </td>
                     `;
