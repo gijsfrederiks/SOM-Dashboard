@@ -230,10 +230,7 @@
                         <button onclick="prepareAndPrint(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center justify-between text-gray-700 dark:text-gray-200">
                             <span><span class="mr-2 opacity-70">🖨️</span> PDF / Printen</span> <span class="text-xs text-gray-400">Ctrl+P</span>
                         </button>
-                        <button onclick="exportFullToExcel(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-green-50 dark:hover:bg-gray-700 flex items-center text-somGreen dark:text-green-400 font-medium border-t border-gray-100 dark:border-gray-700 mt-1 pt-2">
-                            <span class="mr-2">📑</span> Alles naar Excel (.xlsx)
-                        </button>
-                        <button onclick="exportMatrixToExcel(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-green-50 dark:hover:bg-gray-700 flex items-center text-somGreen dark:text-green-400 font-medium">
+                        <button onclick="exportMatrixToExcel(); closeAllDropdowns();" class="w-full text-left px-4 py-2 hover:bg-green-50 dark:hover:bg-gray-700 flex items-center text-somGreen dark:text-green-400 font-medium border-t border-gray-100 dark:border-gray-700 mt-1 pt-2">
                             <span class="mr-2">📊</span> Matrix naar Excel (.xls)
                         </button>
                     </div>
@@ -1382,17 +1379,20 @@
                 const el = document.getElementById(id); 
                 return el ? el.value.replace(/\n/g, '<br>') : ''; 
             };
+            const projName = val('project_subtitle') || '[projectnaam]';
 
             let content = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Zwartewaterland Omgevingsanalyse</title><style>
                 body{font-family:'Calibri','Arial',sans-serif;font-size:11pt;}
-                h1{color:#1E40AF;font-size:20pt;border-bottom:2px solid #2563EB;padding-bottom:5px;}
-                h2{color:#2563EB;font-size:14pt;margin-top:20pt;}
-                h3{color:#4B5563;font-size:12pt;}
+                h1{color:#1E40AF;font-size:16pt;border-bottom:2px solid #2563EB;padding-bottom:5px; margin-top:20pt;}
+                h2{color:#2563EB;font-size:14pt;margin-top:15pt;}
+                h3{color:#4B5563;font-size:12pt;margin-top:10pt;}
                 table{border-collapse:collapse;width:100%;margin-bottom:20px;}
                 th,td{border:1px solid #9CA3AF;padding:6px;vertical-align:top;}
                 th{background-color:#F3F4F6;text-align:left;font-weight:bold;}
-                p{margin-bottom:10pt;}
+                p{margin-bottom:10pt; line-height: 1.2;}
                 ul{margin-top:0;}
+                .toc { margin-bottom: 20pt; line-height: 1.5; }
+                table.no-border, table.no-border td { border: none !important; padding: 2px 4px; }
                 
                 /* Specifieke MS Word Pagina-oriëntaties */
                 @page WordSectionPortrait { size: 595.3pt 841.9pt; margin: 1.0in; mso-header-margin: .5in; mso-footer-margin: .5in; mso-paper-source: 0; }
@@ -1403,21 +1403,107 @@
             </style></head><body>`;
 
             content += `<div class="WordSectionPortrait">`;
-            content += `<h1>Zwartewaterland Omgevingsanalyse: ${val('project_subtitle') || 'Concept project'}</h1>`;
+            
+            // Voorblad / Titel
+            content += `<p style="font-size: 24pt; font-weight: bold; color:#1E40AF; margin-bottom: 0;">Omgevingsmanagement</p>`;
+            content += `<p style="font-size: 16pt; color:#4B5563;">Analyse en strategie voor project ${projName}</p>`;
+            
+            // Inhoudsopgave
+            content += `<br clear="all" style="page-break-before:always; mso-break-type:page-break">`;
+            content += `<h1>Inhoudsopgave</h1>`;
+            content += `<div class="toc">
+                <strong>1. Inleiding</strong><br>
+                &nbsp;&nbsp;1.1. Doel van dit document<br>
+                &nbsp;&nbsp;1.2. Opgave en scope<br>
+                &nbsp;&nbsp;1.3. Context van de opgave<br>
+                &nbsp;&nbsp;1.4. Doel omgevingsmanagement<br>
+                &nbsp;&nbsp;1.5. De SOM-Methodiek<br><br>
+                <strong>2. Analyse</strong><br>
+                &nbsp;&nbsp;2.1. Issues en kansen<br>
+                &nbsp;&nbsp;2.2. Stakeholderlijst<br>
+                &nbsp;&nbsp;2.3. Interne analyse<br>
+                &nbsp;&nbsp;2.4. Basismatrix (bijlage)<br><br>
+                <strong>3. Strategie: Wat is onze omgevingsgerichte aanpak?</strong><br>
+                &nbsp;&nbsp;3.1. Algemene strategie<br>
+                &nbsp;&nbsp;3.2. Strategie per stakeholder<br><br>
+                <strong>4. Bijlagen</strong><br>
+                &nbsp;&nbsp;Bijlage I - SOM Basismatrix<br>
+                &nbsp;&nbsp;Bijlage II - Stakeholderlijst inclusief contactgegevens<br>
+            </div>`;
 
-            content += `<h2>1. Opgave bepalen</h2>`;
-            content += `<strong>Wat is de opgave?</strong><br><p>${val('input_opgave_1')}</p>`;
-            content += `<strong>Doel omgevingsmanagement:</strong><br><p>${val('input_opgave_2')}</p>`;
-            content += `<strong>Context:</strong><br><p>${val('input_context')}</p>`;
+            content += `<br clear="all" style="page-break-before:always; mso-break-type:page-break">`;
+            
+            // Hoofdstuk 1
+            content += `<h1>1. Inleiding</h1>`;
+            content += `<h2>1.1. Doel van dit document</h2>`;
+            content += `<p>Dit document betreft project ${projName}.<br>
+            Het doel van dit document is om de SOM-methodiek/omgevingsgericht werken/gebiedsgericht werken, participatie en communicatie binnen het project/programma/beleidsdossier ${projName} concreet te maken.<br>
+            Dit wordt gedaan op basis van een SOM-Analyse en de uitgangspunten en doelen voor het betrekken van stakeholders.<br>
+            Na een beschrijving van de opgave in deze eerste sectie, behandelt dit document kort het fundament van de SOM-methode voor omgevingsgericht werken. Hierna volgen de doelen en uitgangspunten voor het betrekken van stakeholders bij de opgave. Hierna volgt de SOM Analyse waarin de kernvragen voor de SOM-Strategie geïdentificeerd worden. In sectie 3 volgt dan de SOM-Strategie om stakeholders zorgvuldig te betrekken bij ${projName}. In de bijlage zijn die bronnen en instrumenten opgenomen die bijdragen aan de analyse en de strategie.</p>`;
 
-            content += `<h2>2. Issues & Stakeholders</h2>`;
-            content += `<h3>Issues</h3><ul>`;
+            content += `<h2>1.2. Opgave en scope</h2>`;
+            content += `<p><strong>Wat is de opgave?</strong></p>`;
+            content += `<p>${val('input_opgave_1')}</p>`;
+
+            content += `<h2>1.3. Context van de opgave</h2>`;
+            content += `<p>${val('input_context')}</p>`;
+            content += `<p><em>Belangrijke elementen van de context waarbinnen deze opgave zich afspeelt zijn:</em><br>
+            Maatschappij:<br>
+            Emoties:<br>
+            Politiek:<br>
+            Fysieke leefomgeving:<br>
+            Wet- en regelgeving:<br>
+            Anders:</p>`;
+
+            content += `<h2>1.4. Doel omgevingsmanagement</h2>`;
+            content += `<p>${val('input_opgave_2')}</p>`;
+            content += `<p><em>Doelen voor het betrekken van de omgeving zijn project-specifiek. Dat wil zeggen dat de doelen concreet maken hoe het betrekken van de omgeving bijdraagt aan het duurzaam realiseren van de opgave. Wat willen de initiatiefnemers/de organisatie/de overheid bereiken met het betrekken van de omgeving?</em><br>
+            Concept doelen:<br>
+            1.<br>
+            2.<br>
+            3.</p>`;
+
+            content += `<h2>1.5. De SOM-Methodiek</h2>`;
+            content += `<p>Gemeente Zwartewaterland zet in op een omgevingsgerichte aanpak, waarbij bewust rekening gehouden wordt met de belangen van betrokken partijen en die van de initiatiefnemers, ook als die belangen ogenschijnlijk recht tegenover elkaar staan. Dit betekent dat...<br><br>
+            Om deze omgevingsgerichte aanpak zorgvuldig te doen, maken we gebruik van de SOM-methode. SOM staat voor Strategisch OmgevingsManagement: een context onafhankelijke en herhaalbare werkwijze, waarbij vanuit oprechte interesse in de belangen van partijen, in een consensus gericht proces gezocht wordt naar een oplossing die door alle betrokken partijen gedragen en zoveel mogelijk als winst beoordeeld wordt, en bovendien het onderling vertrouwen versterkt. Binnen de SOM-methode geeft de SOM-Analyse de issues, belanghebbenden, belangen, spanning en beoogde participatieniveaus weer binnen de opgave.<br><br>
+            Vanuit de opgave worden issues (potentiële knelpunten, kwesties, vraagstukken) en kansen in beeld gebracht, zowel op inhoud als proces.<br>
+            De SOM-Analyse levert een serie aan kernvragen en/of dilemma’s op, die beantwoord moeten worden in de SOM-strategie.</p>`;
+
+            // Hoofdstuk 2
+            content += `<h1>2. Analyse</h1>`;
+            content += `<h2>2.1. Issues en kansen</h2>`;
+            content += `<p>Een issue is een kwestie waarover discussie is tussen partijen of kan ontstaan. Daarnaast zit er vaak een bepaald niveau van spanning op een issue of kan deze zich na verloop van tijd ontwikkelen. Elk issue heeft verschillende belanghebbenden die op verschillende niveaus in hun belang geraakt worden op deze issues.<br><br>
+            Kansen doen zich voor als gevolg van het realiseren van een opgave. Kansen kunnen direct het gevolg zijn van het realiseren van een opgave of ze kunnen een keuzemogelijkheid zijn om mee te nemen in realisatie (koppelkansen). Binnen de SOM-analyse is het van belang om eerst de issues/kansen te identificeren, om vervolgens daar de stakeholders bij te identificeren. Hiermee voorkomen we een stakeholderveld van alleen maar usual suspects en krijgen we een eerste indruk van mogelijke agenda’s en ‘tafels’ waaraan dialoog gevoerd kan worden over de issues/kansen.<br><br>
+            Er zijn vooralsnog <strong>${issuesData.length}</strong> issues en kansen geïdentificeerd.</p>`;
+            
+            content += `<ul>`;
             issuesData.forEach(i => content += `<li>${i.title}</li>`);
-            content += `</ul><h3>Stakeholders</h3><ul>`;
-            projectStakeholders.forEach(s => content += `<li>${s.name} ${s.address ? '('+s.address+')' : ''}</li>`);
             content += `</ul>`;
+            content += `<p>De issues zijn onderdeel van de SOM Basismatrix (zie Bijlage I).</p>`;
 
-            content += `<h2>3. Interne inventarisatie vakdisciplines</h2>`;
+            content += `<h2>2.2. Stakeholderlijst</h2>`;
+            content += `<p>Stakeholders (belanghebbenden) zijn groepen, partijen of individuen die een aantoonbaar belang hebben bij de opgave en de issues die daaruit voortkomen. Via methodische werkwijze zijn de stakeholders in beeld gebracht. Deze zijn opgenomen in de belangenmatrix van Bijlage I.<br><br>
+            Vooralsnog telt de lijst <strong>${projectStakeholders.length}</strong> stakeholders. Een inschatting van de issues/kansen waarbij deze partijen belang hebben is meegenomen, evenals een inschatting van het gewicht van belangen. Voor zover bekend is de spanningsbarometer ingevuld, als mede een initieel ingeschat participatieniveau.</p>`;
+
+            if (projectStakeholders.length > 0) {
+                content += `<p><strong>Overzicht van de stakeholders:</strong></p>`;
+                content += `<table class="no-border" style="width: 100%; margin-top: 5pt; margin-bottom: 15pt;">`;
+                for (let i = 0; i < projectStakeholders.length; i += 2) {
+                    content += `<tr>`;
+                    content += `<td style="width: 50%;">• ${projectStakeholders[i].name}</td>`;
+                    if (i + 1 < projectStakeholders.length) {
+                        content += `<td style="width: 50%;">• ${projectStakeholders[i+1].name}</td>`;
+                    } else {
+                        content += `<td style="width: 50%;"></td>`;
+                    }
+                    content += `</tr>`;
+                }
+                content += `</table>`;
+            }
+
+            content += `<h2>2.3. Interne analyse</h2>`;
+            content += `<p>Het is belangrijk om ook intern een analyse uit te voeren naar relevante stakeholders. Denk bijvoorbeeld aan een scan voor alle disciplines openbare ruimte (onder andere groen, wegen, water).</p>`;
+            
             const disciplines = [
                 {id: 'groen', name: 'Groen'}, {id: 'riool', name: 'Riolering & Water'},
                 {id: 'wegen_beheer', name: 'Wegen'}, {id: 'verkeer', name: 'Verkeer'},
@@ -1430,13 +1516,36 @@
             disciplines.forEach(d => {
                 content += `<tr><td><strong>${d.name}</strong></td><td>${val('contact_'+d.id)}</td><td>${val('disc_'+d.id)}</td></tr>`;
             });
-            content += `</table></div>`;
+            content += `</table>`;
 
-            // Start Liggende Pagina voor Matrix
+            content += `<h2>2.4. Basismatrix (bijlage)</h2>`;
+            content += `<p>Om een SOM-Strategie voor het betrekken van de omgeving te maken, is een analyse van belangen en spanning nodig. De belangenmatrix (Bijlage I) kan hierbij helpen aangezien de belangen en de aanwezige spanning in relatie tot de verschillende issues van elkaar verschillen.<br><br>
+            De belangenmatrix geeft door middel van kleuren gebaseerd op een vijfpuntschaal aan hoe zwaar de belangen zijn per belanghebbende per issue: dit kan variëren van een extreem groot belang, tot nauwelijks of onbekend belang. Doordat spanning snel kan veranderen laat het zich beter vertalen in een barometer die van tijd tot tijd kan worden herijkt. Ook deze is op basis van een vijfpuntschaal gemaakt, waarbij de spanning varieert van kritiek tot positieve of onduidelijke spanning.</p>`;
+
+            // Hoofdstuk 3
+            content += `<h1>3. Strategie: Wat is onze omgevingsgerichte aanpak?</h1>`;
+            content += `<h2>3.1. Algemene strategie</h2>`;
+            content += `<p>${val('input_strategie')}</p>`;
+            
+            content += `<h2>3.2. Strategie per stakeholder</h2>`;
+            content += `<ul>`;
+            projectStakeholders.forEach(sh => {
+                if(sh.strategyText) content += `<li><strong>${sh.name}:</strong><br>${sh.strategyText.replace(/\n/g, '<br>')}</li>`;
+            });
+            content += `</ul>`;
+            
+            content += `<p><strong>Borging:</strong><br>`;
+            content += `Opgesteld door: ${val('borging_door')}<br>`;
+            content += `Samen met: ${val('borging_met')}<br>`;
+            content += `Datum: ${val('borging_datum')}<br>`;
+            content += `Status: ${val('val_status')}</p></div>`;
+
+            // Start Liggende Pagina voor Matrix (Bijlagen)
             content += `<br clear="all" style="page-break-before:always; mso-break-type:section-break">`;
             content += `<div class="WordSectionLandscape">`;
 
-            content += `<h2>4. SOM Basismatrix</h2>`;
+            content += `<h1>4. Bijlagen</h1>`;
+            content += `<h2>Bijlage I - SOM Basismatrix</h2>`;
             content += `<table style="font-size: 9pt;"><tr><th style="width: 15%;">Stakeholder</th>`;
             issuesData.forEach(issue => content += `<th>${issue.title}</th>`);
             content += `<th style="width: 10%;">Verwacht Belang</th><th style="width: 10%;">Verwachte Spanning</th><th style="width: 10%;">Strategie</th><th style="width: 20%;">Opmerkingen</th></tr>`;
@@ -1499,31 +1608,23 @@
             }
             content += `</table></div>`;
 
-            // Terug naar Staande Pagina voor het slot
+            // Terug naar Staande Pagina voor Bijlage II
             content += `<br clear="all" style="page-break-before:always; mso-break-type:section-break">`;
             content += `<div class="WordSectionPortrait">`;
 
-            content += `<h2>5. Strategie: Wat is onze omgevingsgerichte aanpak?</h2>`;
-            content += `<h3>Algemene Strategie</h3><p>${val('input_strategie')}</p>`;
-            content += `<h3>Strategie per Stakeholder</h3><ul>`;
-            projectStakeholders.forEach(sh => {
-                if(sh.strategyText) content += `<li><strong>${sh.name}:</strong><br>${sh.strategyText.replace(/\n/g, '<br>')}</li>`;
-            });
-            content += `</ul>`;
-
-            content += `<h2>6. Contactenlijst</h2>`;
+            content += `<h2>Bijlage II - Stakeholderlijst inclusief contactgegevens</h2>`;
             content += `<table><tr><th width="25%">Stakeholder / Organisatie</th><th width="20%">Contactpersoon</th><th width="15%">Telefoon</th><th width="20%">E-mail</th><th width="20%">Adres / Notities</th></tr>`;
             projectStakeholders.forEach(sh => {
                 content += `<tr><td><strong>${sh.name}</strong></td><td>${sh.contactPerson || ''}</td><td>${sh.phone || ''}</td><td>${sh.email || ''}</td><td>${sh.address || ''} ${sh.contactNotes ? '<br><i>' + sh.contactNotes + '</i>' : ''}</td></tr>`;
             });
             content += `</table>`;
 
-            content += `<h2>7. Uitkomsten stakeholdergesprekken</h2>`;
+            // Gespreksnotities worden toegevoegd aan Bijlage II als extra nuttige info (zodat de data in Word komt)
             projectStakeholders.forEach(sh => {
                 if(sh.includeInRemarks && sh.conversations && sh.conversations.length > 0) {
                     let hasNotes = sh.conversations.some(c => c.notes.trim() !== '');
                     if(hasNotes) {
-                        content += `<h3>${sh.name}</h3>`;
+                        content += `<h3>Notities gesprekken: ${sh.name}</h3>`;
                         sh.conversations.forEach((c, cIdx) => {
                             content += `<p><strong>Gesprek ${cIdx+1} (${c.date}):</strong><br>${c.notes.replace(/\n/g, '<br>')}</p>`;
                         });
@@ -1531,11 +1632,7 @@
                 }
             });
 
-            content += `<h2>8. Borging</h2>`;
-            content += `<p><strong>Opgesteld door:</strong> ${val('borging_door')}<br>`;
-            content += `<strong>Samen met:</strong> ${val('borging_met')}<br>`;
-            content += `<strong>Datum:</strong> ${val('borging_datum')}<br>`;
-            content += `<strong>Status:</strong> ${val('val_status')}</p></div></body></html>`;
+            content += `</div></body></html>`;
 
             const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
             const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(content);
