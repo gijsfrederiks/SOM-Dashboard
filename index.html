@@ -316,7 +316,7 @@
                 </button>
                 <button onclick="switchTab('step3')" id="tab-step3" class="sidebar-tab w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all border-l-4 border-transparent flex items-center gap-2.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    3. Interne inventarisatie
+                    3. Interne invent. & afstemming
                 </button>
                 <button onclick="switchTab('step4')" id="tab-step4" class="sidebar-tab w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all border-l-4 border-transparent flex items-center gap-2.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
@@ -571,7 +571,7 @@
                                 </div>
                             </details>
 
-                            <div class="grid lg:grid-cols-2 gap-8">
+                            <div class="grid lg:grid-cols-2 gap-8 mb-8">
                                 <div class="flex flex-col">
                                     <div class="bg-orange-50/50 dark:bg-orange-950/20 p-5 rounded-xl border border-orange-100 dark:border-orange-900/50 h-full">
                                         <h3 class="font-bold text-somOrange mb-4 flex justify-between items-center text-lg">
@@ -585,43 +585,47 @@
                                     </div>
                                 </div>
 
-                                <div class="flex flex-col h-full min-h-[400px]">
-                                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 flex flex-col relative overflow-hidden h-full shadow-sm">
-                                        <h3 class="font-bold text-slate-800 dark:text-white text-lg mb-3 border-b border-gray-100 dark:border-slate-700 pb-2">Stakeholders Toevoegen</h3>
-                                        
-                                        <div class="space-y-3 mb-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
-                                            <input type="text" id="new_sh_name" placeholder="Naam stakeholder (Bv. Aanwonenden Kerkstraat)" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white bg-white focus:ring-2 focus:ring-somOrange focus:outline-none text-sm transition-all" onkeypress="if(event.key === 'Enter') document.getElementById('new_sh_address').focus()">
-                                            <div class="flex gap-2">
-                                                <input type="text" id="new_sh_address" placeholder="Adres / Woonplaats (Optioneel voor kaart)" class="flex-grow p-2.5 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white bg-white focus:ring-2 focus:ring-somOrange focus:outline-none text-sm transition-all" onkeypress="if(event.key === 'Enter') addProjectStakeholderFromInputs()">
-                                                <button onclick="addProjectStakeholderFromInputs()" class="bg-somOrange hover:bg-orange-600 text-white px-5 rounded-lg font-bold transition shadow-sm text-sm">Toevoegen</button>
+                                <div class="flex flex-col">
+                                    <div class="border border-orange-200 bg-orange-50/30 dark:bg-orange-950/20 dark:border-orange-900/50 rounded-xl p-5 shadow-sm relative h-full flex flex-col">
+                                        <div class="flex justify-between items-center mb-3 group">
+                                            <h3 class="font-bold text-somOrange text-lg flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-somOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                                Kansen in kaart brengen
+                                            </h3>
+                                            <span class="text-somOrange cursor-help no-print transition-transform hover:scale-110 text-lg">❓</span>
+                                            <div class="absolute right-0 top-8 w-80 p-4 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
+                                                <strong>Toelichting:</strong>
+                                                <ul class="list-disc list-inside mt-2 space-y-1.5">
+                                                    <li>Op welke manier kan onze opgave ook van waarde zijn voor anderen?</li>
+                                                    <li>Waar liggen de mogelijkheden om samen met stakeholders waarde aan de opgave toe te voegen?</li>
+                                                    <li>Op welke manier moet de opgave veranderen om waarde voor stakeholders toe te kunnen voegen?</li>
+                                                </ul>
                                             </div>
                                         </div>
-
-                                        <div class="flex-1 overflow-y-auto pr-2 bg-slate-50/50 dark:bg-slate-900/10 rounded-lg border border-slate-100 dark:border-slate-800 p-2">
-                                            <ul id="list_sec2" class="shared-sh-list space-y-1.5"></ul>
-                                        </div>
+                                        <textarea id="input_kansen" rows="3" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-850 focus:ring-2 focus:ring-somOrange focus:outline-none resize-none overflow-hidden transition-all text-sm bg-white flex-1 min-h-[150px]" placeholder="Beschrijf hier de kansen en mogelijkheden die het project brengt" oninput="autoResize(this)"></textarea>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Kansen Blok -->
-                            <div class="mt-8 mb-8 border border-orange-200 bg-orange-50/30 dark:bg-orange-950/20 dark:border-orange-900/50 rounded-xl p-5 shadow-sm relative">
-                                <div class="flex justify-between items-center mb-3 group">
-                                    <h3 class="font-bold text-somOrange text-lg flex items-center gap-2">
-                                        <svg class="w-5 h-5 text-somOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                        Kansen in kaart brengen
-                                    </h3>
-                                    <span class="text-somOrange cursor-help no-print transition-transform hover:scale-110 text-lg">❓</span>
-                                    <div class="absolute right-0 top-8 w-80 p-4 bg-gray-800 text-white text-xs rounded-lg shadow-xl z-50 hidden group-hover:block pointer-events-none">
-                                        <strong>Toelichting:</strong>
-                                        <ul class="list-disc list-inside mt-2 space-y-1.5">
-                                            <li>Op welke manier kan onze opgave ook van waarde zijn voor others?</li>
-                                            <li>Waar liggen de mogelijkheden om samen met stakeholders waarde aan de opgave toe te voegen?</li>
-                                            <li>Op welke manier moet de opgave veranderen om waarde voor stakeholders toe te kunnen voegen?</li>
-                                        </ul>
+                            <!-- Stakeholders Blok -->
+                            <div class="flex flex-col h-full min-h-[400px] mb-8">
+                                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 flex flex-col relative overflow-hidden h-full shadow-sm">
+                                    <h3 class="font-bold text-slate-800 dark:text-white text-lg mb-3 border-b border-gray-100 dark:border-slate-700 pb-2">Stakeholders Toevoegen</h3>
+                                    
+                                    <div class="space-y-3 mb-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
+                                        <div class="flex flex-col md:flex-row gap-3">
+                                            <input type="text" id="new_sh_name" placeholder="Naam stakeholder (Bv. Aanwonenden Kerkstraat)" class="w-full md:w-1/2 p-2.5 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white bg-white focus:ring-2 focus:ring-somOrange focus:outline-none text-sm transition-all" onkeypress="if(event.key === 'Enter') document.getElementById('new_sh_address').focus()">
+                                            <div class="flex gap-2 w-full md:w-1/2">
+                                                <input type="text" id="new_sh_address" placeholder="Adres / Woonplaats (Optioneel voor kaart)" class="flex-grow p-2.5 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-800 dark:text-white bg-white focus:ring-2 focus:ring-somOrange focus:outline-none text-sm transition-all" onkeypress="if(event.key === 'Enter') addProjectStakeholderFromInputs()">
+                                                <button onclick="addProjectStakeholderFromInputs()" class="bg-somOrange hover:bg-orange-600 text-white px-5 rounded-lg font-bold transition shadow-sm text-sm shrink-0">Toevoegen</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 overflow-y-auto pr-2 bg-slate-50/50 dark:bg-slate-900/10 rounded-lg border border-slate-100 dark:border-slate-800 p-3">
+                                        <ul id="list_sec2" class="shared-sh-list grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></ul>
                                     </div>
                                 </div>
-                                <textarea id="input_kansen" rows="3" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-850 focus:ring-2 focus:ring-somOrange focus:outline-none resize-none overflow-hidden transition-all text-sm bg-white" placeholder="Beschrijf hier de kansen en mogelijkheden die het project brengt" oninput="autoResize(this)"></textarea>
                             </div>
 
                             <div class="mt-8 border border-slate-200 dark:border-slate-700 rounded-xl p-1 shadow-sm h-[400px] relative w-full overflow-hidden bg-white dark:bg-slate-850">
@@ -648,7 +652,7 @@
                         <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gray-700">
                             <h2 class="text-2xl font-bold text-somTeal flex items-center">
                                 <span class="w-8 h-8 rounded-full bg-somTeal text-white flex items-center justify-center text-sm mr-3 print:hidden">3</span>
-                                <span class="print:mr-2">3.</span> Interne inventarisatie
+                                <span class="print:mr-2">3.</span> Interne inventarisatie en afstemming
                             </h2>
                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 ml-11 italic leading-relaxed">Een omgevingsanalyse is niet alleen extern gericht. Naast een externe analyse van issues en belanghebbenden is het belangrijk om ook intern een goede analyse uit te voeren naar relevante stakeholders. Wat speelt er binnen de organisatie wat relevant is voor het project?</p>
                         </div>
@@ -686,93 +690,223 @@
 
                             <!-- ACTIEVE DISCIPLINES GRID -->
                             <div id="step3_content_container" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Groen</label>
-                                            <input type="text" id="contact_groen" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
-                                        </div>
-                                        <textarea id="disc_groen" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Bomenkap? Wortelopdruk? Kansen voor vergroening?" oninput="autoResize(this)"></textarea>
-                                    </div>
+                                
+                                <!-- Deel 3.1 -->
+                                <div>
+                                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                                        <span class="text-somTeal">3.1</span> Inventarisatieronde intern
+                                    </h3>
                                     
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Riolering & Water</label>
-                                            <input type="text" id="contact_riool" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                    <!-- Selector -->
+                                    <div class="mb-6 p-4 bg-teal-50/50 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/50 rounded-xl no-print shadow-sm">
+                                        <h4 class="font-bold text-sm text-somTeal dark:text-teal-400 mb-3 flex items-center gap-1.5">
+                                            <svg class="w-5 h-5 text-somTeal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                            Selecteer relevante disciplines voor dit project:
+                                        </h4>
+                                        <div id="disciplineTogglesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+                                            <!-- Dynamisch gevuld -->
                                         </div>
-                                        <textarea id="disc_riool" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Straat open? Afkoppelen regenpijpen?" oninput="autoResize(this)"></textarea>
                                     </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Wegen</label>
-                                            <input type="text" id="contact_wegen_beheer" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                    <div class="grid grid-cols-1 gap-5">
+                                        <div id="card_disc_groen" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Groen
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_groen" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_groen" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Bomenkap? Wortelopdruk? Kansen voor vergroening?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_wegen_beheer" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Kwaliteit verharding? Schadebeelden?" oninput="autoResize(this)"></textarea>
-                                    </div>
+                                        
+                                        <div id="card_disc_riool" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Riolering & Water
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_riool" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_riool" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Straat open? Afkoppelen regenpijpen?" oninput="autoResize(this)"></textarea>
+                                        </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Verkeer</label>
-                                            <input type="text" id="contact_verkeer" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_wegen_beheer" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Wegen
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_wegen_beheer" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_wegen_beheer" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Kwaliteit verharding? Schadebeelden?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_verkeer" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Parkeerdruk? Snelheidsremmers? Schoolroutes?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Klimaatadaptatie</label>
-                                            <input type="text" id="contact_klimaat" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_verkeer" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Verkeer
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_verkeer" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_verkeer" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Parkeerdruk? Snelheidsremmers? Schoolroutes?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_klimaat" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Hittestress? Infiltratie? Ontstening?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Kunstwerken</label>
-                                            <input type="text" id="contact_kunstwerken" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_klimaat" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Klimaatadaptatie
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_klimaat" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_klimaat" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Hittestress? Infiltratie? Ontstening?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_kunstwerken" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Vervanging? Brug in achtertuin (privacy)?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Openbare Verlichting</label>
-                                            <input type="text" id="contact_ovl" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_kunstwerken" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Kunstwerken
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_kunstwerken" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_kunstwerken" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Vervanging? Brug in achtertuin (privacy)?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_ovl" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Lichtinval in woningen? Verplaatsen masten?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Spelen</label>
-                                            <input type="text" id="contact_spelen" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_ovl" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Openbare Verlichting
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_ovl" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_ovl" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Lichtinval in woningen? Verplaatsen masten?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_spelen" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Verandering doelgroep speelplek?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Evenementen</label>
-                                            <input type="text" id="contact_evenementen" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_spelen" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Spelen
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_spelen" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_spelen" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Verandering doelgroep speelplek?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_evenementen" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Check de evenementenkalender." oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Inwonersinitiatieven</label>
-                                            <input type="text" id="contact_inwoners" class="text-xs w-1/2 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_evenementen" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Evenementen
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_evenementen" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_evenementen" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Check de evenementenkalender." oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_inwoners" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Adoptiegroen? Geveltuintjes?" oninput="autoResize(this)"></textarea>
-                                    </div>
 
-                                    <div class="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800 lg:col-span-2">
-                                        <div class="flex justify-between items-end mb-2">
-                                            <label class="font-bold text-slate-700 dark:text-slate-200 text-sm">Beheer & Onderhoud / Overig</label>
-                                            <input type="text" id="contact_overig" class="text-xs w-1/3 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-600 dark:text-slate-400 text-right font-medium" placeholder="Afgestemd met...">
+                                        <div id="card_disc_inwoners" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Inwonersinitiatieven
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_inwoners" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_inwoners" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Adoptiegroen? Geveltuintjes?" oninput="autoResize(this)"></textarea>
                                         </div>
-                                        <textarea id="disc_overig" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all" placeholder="Bekende klachten of meldingen uit de buurt (BinnenBeter)?" oninput="autoResize(this)"></textarea>
+
+                                        <div id="card_disc_ro" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Ruimtelijke Ontwikkeling (RO)
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_ro" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_ro" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Bestemmingsplan? Omgevingsvisie? Vergunningen?" oninput="autoResize(this)"></textarea>
+                                        </div>
+
+                                        <div id="card_disc_communicatie" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Communicatie
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_communicatie" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_communicatie" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Participatieniveau? Bewonersbrief? Persbericht?" oninput="autoResize(this)"></textarea>
+                                        </div>
+
+                                        <div id="card_disc_duurzaamheid" class="bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-100 dark:border-slate-800 transition-all shadow-sm">
+                                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-3">
+                                                <label class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-somTeal inline-block"></span>
+                                                    Duurzaamheid
+                                                </label>
+                                                <div class="flex items-center w-full sm:w-auto">
+                                                    <span class="text-xs text-slate-500 mr-2 whitespace-nowrap">Afgestemd met:</span>
+                                                    <input type="text" id="contact_duurzaamheid" class="w-full sm:w-64 bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none focus:border-somTeal text-slate-700 dark:text-slate-300 font-medium text-sm px-1 pb-1" placeholder="Naam collega...">
+                                                </div>
+                                            </div>
+                                            <textarea id="disc_duurzaamheid" class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-850 focus:ring-1 focus:ring-somTeal focus:outline-none text-sm resize-none overflow-hidden transition-all min-h-[80px]" placeholder="Energietransitie? Circulair bouwen? Subsidies?" oninput="autoResize(this)"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Deel 3.2 -->
+                                <div class="pt-8 mt-8 border-t border-slate-200 dark:border-slate-700">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                            <span class="text-somTeal">3.2</span> Interne afstemming
+                                        </h3>
+                                        <button onclick="addInternalMeeting()" class="text-xs bg-somTeal text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition shadow-sm no-print font-bold flex items-center gap-1">
+                                            + Nieuw overleg
+                                        </button>
+                                    </div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Log hier de interne afstemming en gesprekken met collega's gedurende het project.</p>
+                                    
+                                    <div id="internalMeetingsContainer" class="space-y-4">
+                                        <!-- Dynamisch gevuld via JS -->
                                     </div>
                                 </div>
                                 
@@ -1065,6 +1199,10 @@
         let actionTableData = []; 
         let map; 
         let markers = []; 
+
+        // Nieuwe variabelen voor stap 3
+        let activeDisciplines = ['groen', 'riool', 'wegen_beheer', 'verkeer', 'klimaat', 'kunstwerken', 'ovl', 'spelen', 'evenementen', 'inwoners', 'ro', 'communicatie', 'duurzaamheid'];
+        let internalMeetings = [];
         
         let activeFileHandle = null;
         let hasUnsavedChanges = false;
@@ -1086,6 +1224,8 @@
             renderRemarks(); 
             renderStrategyPerStakeholder(); 
             renderContactenlijst();
+            renderDisciplineToggles(); // Rendert de checkboxes en verstopt inactieve kaarten
+            renderInternalMeetings();  // Rendert het logboek voor interne afstemming
             checkTheme();
             updateProgress();
             updateStep3UI();
@@ -1260,6 +1400,8 @@
                     matrixData = {};
                     actionTableData = [];
                     stakeholderGroups = [];
+                    activeDisciplines = ['groen', 'riool', 'wegen_beheer', 'verkeer', 'klimaat', 'kunstwerken', 'ovl', 'spelen', 'evenementen', 'inwoners', 'ro', 'communicatie', 'duurzaamheid'];
+                    internalMeetings = [];
                     activeFileHandle = null;
                     isStep3Enabled = true;
                     safeStorage.set('somData', JSON.stringify({})); 
@@ -1287,6 +1429,8 @@
             data['issuesData'] = JSON.stringify(issuesData);
             data['matrixData'] = JSON.stringify(matrixData);
             data['isStep3Enabled'] = isStep3Enabled;
+            data['activeDisciplines'] = JSON.stringify(activeDisciplines);
+            data['internalMeetings'] = JSON.stringify(internalMeetings);
             
             const now = new Date();
             const timeStr = now.toLocaleDateString('nl-NL') + ' ' + now.toLocaleTimeString('nl-NL', {hour: '2-digit', minute:'2-digit'});
@@ -1330,6 +1474,8 @@
             if(data.issuesData) issuesData = JSON.parse(data.issuesData);
             if(data.matrixData) matrixData = JSON.parse(data.matrixData);
             if(data.isStep3Enabled !== undefined) isStep3Enabled = data.isStep3Enabled;
+            if(data.activeDisciplines) activeDisciplines = JSON.parse(data.activeDisciplines);
+            if(data.internalMeetings) internalMeetings = JSON.parse(data.internalMeetings);
             
             if(data.lastSaved) {
                 document.getElementById('lastSaved').innerText = "Opgeslagen: " + data.lastSaved;
@@ -1606,27 +1752,44 @@
 
             // STAP 3 (Optioneel)
             if (isStep3Enabled) {
-                content += `<h2>Interne inventarisatie</h2>`;
+                content += `<h2>Interne inventarisatie en afstemming</h2>`;
                 content += `<p>Een omgevingsanalyse is niet alleen extern gericht. Naast een externe analyse van issues en belanghebbenden is het belangrijk om ook intern een goede analyse uit te voeren naar relevante stakeholders. Wat speelt er binnen de organisatie wat relevant is voor het project?</p>`;
-                const disciplines = [
+                
+                content += `<h3>3.1 Inventarisatieronde intern</h3>`;
+                const allDisciplines = [
                     {id: 'groen', name: 'Groen'}, {id: 'riool', name: 'Riolering & Water'},
                     {id: 'wegen_beheer', name: 'Wegen'}, {id: 'verkeer', name: 'Verkeer'},
                     {id: 'klimaat', name: 'Klimaatadaptatie'}, {id: 'kunstwerken', name: 'Kunstwerken'},
                     {id: 'ovl', name: 'Openbare Verlichting'}, {id: 'spelen', name: 'Spelen'},
                     {id: 'evenementen', name: 'Evenementen'}, {id: 'inwoners', name: 'Inwonersinitiatieven'},
-                    {id: 'overig', name: 'Beheer & Onderhoud / Overig'}
+                    {id: 'ro', name: 'Ruimtelijke Ontwikkeling (RO)'}, {id: 'communicatie', name: 'Communicatie'},
+                    {id: 'duurzaamheid', name: 'Duurzaamheid'}
                 ];
                 content += `<table><tr><th width="20%">Discipline</th><th width="30%">Afgestemd met</th><th width="50%">Impact / Notities</th></tr>`;
-                disciplines.forEach(d => {
-                    const contact = val('contact_'+d.id);
-                    const notities = val('disc_'+d.id);
-                    if (contact || notities) {
-                        content += `<tr><td><strong>${d.name}</strong></td><td>${contact}</td><td>${notities}</td></tr>`;
-                    } else {
-                        content += `<tr><td><strong>${d.name}</strong></td><td><span class="empty-text">-</span></td><td><span class="empty-text">-</span></td></tr>`;
+                let disciplineCount = 0;
+                allDisciplines.forEach(d => {
+                    if(activeDisciplines.includes(d.id)) {
+                        disciplineCount++;
+                        const contact = val('contact_'+d.id);
+                        const notities = val('disc_'+d.id);
+                        if (contact || notities) {
+                            content += `<tr><td><strong>${d.name}</strong></td><td>${contact}</td><td>${notities}</td></tr>`;
+                        } else {
+                            content += `<tr><td><strong>${d.name}</strong></td><td><span class="empty-text">-</span></td><td><span class="empty-text">-</span></td></tr>`;
+                        }
                     }
                 });
+                if (disciplineCount === 0) content += `<tr><td colspan="3"><span class="empty-text">Geen disciplines geselecteerd.</span></td></tr>`;
                 content += `</table>`;
+
+                content += `<h3>3.2 Interne afstemming</h3>`;
+                if (internalMeetings.length > 0) {
+                    internalMeetings.forEach((m, idx) => {
+                        content += `<p style="margin-bottom: 5px;"><strong>Overleg ${idx+1} (${m.date || 'Geen datum'}):</strong><br><em>Afgestemd met: ${m.participants || 'Onbekend'}</em><br>${(m.notes || '').replace(/\n/g, '<br>')}</p>`;
+                    });
+                } else {
+                    content += `<p><span class="empty-text">Geen intern overleg gelogd.</span></p>`;
+                }
             }
 
             // STAP 4: Verwijzing naar matrix
@@ -2561,6 +2724,104 @@
             table.appendChild(tbody);
             tableWrapper.appendChild(table);
             container.appendChild(tableWrapper);
+        }
+
+        // --- STAP 3.1 & 3.2 FUNCTIES ---
+        function renderDisciplineToggles() {
+            const container = document.getElementById('disciplineTogglesContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            const allDisciplines = [
+                {id: 'groen', name: 'Groen'}, {id: 'riool', name: 'Riolering & Water'},
+                {id: 'wegen_beheer', name: 'Wegen'}, {id: 'verkeer', name: 'Verkeer'},
+                {id: 'klimaat', name: 'Klimaatadaptatie'}, {id: 'kunstwerken', name: 'Kunstwerken'},
+                {id: 'ovl', name: 'Openbare Verlichting'}, {id: 'spelen', name: 'Spelen'},
+                {id: 'evenementen', name: 'Evenementen'}, {id: 'inwoners', name: 'Inwonersinitiatieven'},
+                {id: 'ro', name: 'Ruimtelijke Ontwikkeling (RO)'}, {id: 'communicatie', name: 'Communicatie'},
+                {id: 'duurzaamheid', name: 'Duurzaamheid'}
+            ];
+
+            allDisciplines.forEach(d => {
+                const isChecked = activeDisciplines.includes(d.id);
+                
+                // Toggle card visibility
+                const card = document.getElementById('card_disc_' + d.id);
+                if(card) {
+                    if(isChecked) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+
+                // Render checkbox
+                const label = document.createElement('label');
+                label.className = "flex items-center space-x-2 text-sm cursor-pointer hover:bg-white dark:hover:bg-slate-800 p-2 rounded-lg transition-all select-none border border-transparent hover:border-slate-100 dark:hover:border-slate-700/50";
+                label.innerHTML = `<input type="checkbox" class="form-checkbox text-somTeal rounded border-gray-300 bg-white" ${isChecked ? 'checked' : ''} onchange="toggleDiscipline('${d.id}')"><span class="dark:text-gray-300 truncate font-semibold ${isChecked ? 'text-slate-800' : 'text-slate-500'}">${d.name}</span>`;
+                container.appendChild(label);
+            });
+        }
+
+        function toggleDiscipline(id) {
+            if(activeDisciplines.includes(id)) {
+                activeDisciplines = activeDisciplines.filter(d => d !== id);
+            } else {
+                activeDisciplines.push(id);
+            }
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderDisciplineToggles();
+        }
+
+        function addInternalMeeting() {
+            internalMeetings.push({ date: '', participants: '', notes: '' });
+            setUnsavedChanges(true);
+            saveDataLocal();
+            renderInternalMeetings();
+        }
+
+        function removeInternalMeeting(idx) {
+            showModal('Overleg verwijderen', 'Weet je zeker dat je dit interne overleg wilt verwijderen?', function() {
+                internalMeetings.splice(idx, 1);
+                setUnsavedChanges(true);
+                saveDataLocal();
+                renderInternalMeetings();
+            });
+        }
+
+        function renderInternalMeetings() {
+            const container = document.getElementById('internalMeetingsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            if(internalMeetings.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 italic">Nog geen intern overleg toegevoegd.</p>';
+                return;
+            }
+
+            internalMeetings.forEach((meeting, idx) => {
+                const div = document.createElement('div');
+                div.className = "bg-teal-50/30 dark:bg-teal-950/10 border border-teal-100 dark:border-teal-900/40 rounded-xl p-5 relative shadow-inner group";
+                
+                div.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-start mb-4 gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-extrabold text-somTeal bg-teal-100/60 dark:bg-teal-950 px-2.5 py-1 rounded-md uppercase tracking-wider">Overleg ${idx + 1}</span>
+                            <input type="date" value="${meeting.date}" class="text-sm border border-slate-200 dark:border-slate-700 rounded-md px-3 py-1.5 bg-white dark:bg-slate-850 dark:text-white focus:outline-none focus:ring-1 focus:ring-somTeal transition-all font-semibold" oninput="internalMeetings[${idx}].date = this.value; setUnsavedChanges(true); saveDataLocal();">
+                        </div>
+                        <button onclick="removeInternalMeeting(${idx})" class="text-red-400 hover:text-red-600 px-2 no-print text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity" title="Verwijder overleg">✕</button>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" placeholder="Met wie afgestemd (namen, afdeling, rol)..." class="w-full text-sm border-b border-slate-200 dark:border-slate-700 bg-transparent px-1 py-1.5 dark:text-white focus:outline-none focus:border-somTeal font-medium" value="${meeting.participants || ''}" oninput="internalMeetings[${idx}].participants = this.value; setUnsavedChanges(true); saveDataLocal();">
+                    </div>
+                    <textarea class="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-850 focus:ring-1 focus:ring-somTeal min-h-[80px] resize-none overflow-hidden text-sm bg-white dark:text-slate-200" placeholder="Notities, afspraken, actiepunten..." oninput="internalMeetings[${idx}].notes = this.value; setUnsavedChanges(true); saveDataLocal(); autoResize(this)">${meeting.notes}</textarea>
+                `;
+                container.appendChild(div);
+            });
+
+            setTimeout(() => {
+                container.querySelectorAll('textarea').forEach(el => autoResize(el));
+            }, 10);
         }
 
         // --- MAP FUNCTIONS ---
