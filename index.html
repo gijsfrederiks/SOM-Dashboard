@@ -164,9 +164,62 @@
             #map-container { height: 300px !important; border: 1px solid #ccc; page-break-inside: avoid; }
         }
         #print-header { display: none; }
+
+        /* Splash Screen Animaties */
+        .splash-hidden { opacity: 0 !important; visibility: hidden; transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out; }
+        .animate-draw-line { stroke-dasharray: 120; stroke-dashoffset: 120; animation: drawLine 1s ease-out forwards; }
+        .animate-pop-node { opacity: 0; transform: scale(0); animation: popNode 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes popNode { to { opacity: 1; transform: scale(1); } }
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 151, 216, 0.5)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 30px rgba(0, 151, 216, 1)); transform: scale(1.05); }
+        }
+        .animate-pulse-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
     </style>
 </head>
 <body class="bg-appGray dark:bg-darkBg text-slate-800 dark:text-gray-200 font-sans flex flex-col h-screen w-full overflow-hidden">
+
+    <!-- Splash Screen (Startscherm) -->
+    <div id="splash-screen" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-zwlDarkBlue to-[#001226] text-white overflow-hidden transition-opacity duration-700 print:hidden">
+        
+        <!-- Abstract Netwerk Visualisatie -->
+        <div class="relative w-72 h-72 mb-8">
+            <svg viewBox="0 0 200 200" class="w-full h-full overflow-visible">
+                <!-- Geanimeerde lijnen naar stakeholders -->
+                <line x1="100" y1="100" x2="100" y2="20" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 0.1s;" stroke-linecap="round" />
+                <line x1="100" y1="100" x2="175" y2="60" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 0.3s;" stroke-linecap="round" />
+                <line x1="100" y1="100" x2="175" y2="140" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 0.5s;" stroke-linecap="round" />
+                <line x1="100" y1="100" x2="100" y2="180" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 0.7s;" stroke-linecap="round" />
+                <line x1="100" y1="100" x2="25" y2="140" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 0.9s;" stroke-linecap="round" />
+                <line x1="100" y1="100" x2="25" y2="60" stroke="#0097d8" stroke-width="2.5" class="animate-draw-line" style="animation-delay: 1.1s;" stroke-linecap="round" />
+                
+                <!-- Stakeholder Nodes (Gekleurde bollen) -->
+                <circle cx="100" cy="20" r="10" fill="#F97316" class="animate-pop-node origin-[100px_20px]" style="animation-delay: 0.3s;" />
+                <circle cx="175" cy="60" r="12" fill="#10B981" class="animate-pop-node origin-[175px_60px]" style="animation-delay: 0.5s;" />
+                <circle cx="175" cy="140" r="8" fill="#F59E0B" class="animate-pop-node origin-[175px_140px]" style="animation-delay: 0.7s;" />
+                <circle cx="100" cy="180" r="14" fill="#14B8A6" class="animate-pop-node origin-[100px_180px]" style="animation-delay: 0.9s;" />
+                <circle cx="25" cy="140" r="10" fill="#EF4444" class="animate-pop-node origin-[25px_140px]" style="animation-delay: 1.1s;" />
+                <circle cx="25" cy="60" r="12" fill="#9dc221" class="animate-pop-node origin-[25px_60px]" style="animation-delay: 1.3s;" />
+                
+                <!-- Middelpunt (Het Project) -->
+                <circle cx="100" cy="100" r="22" fill="#0097d8" class="origin-center animate-pulse-glow shadow-lg" />
+                <text x="100" y="105" font-family="sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle" class="animate-pop-node origin-center">SOM</text>
+            </svg>
+        </div>
+        
+        <!-- Welkomsttekst & Knop -->
+        <div class="text-center animate-pop-node origin-bottom" style="animation-delay: 1.4s;">
+            <h1 class="text-4xl font-black tracking-tight mb-2 drop-shadow-md">Gemeente Zwartewaterland</h1>
+            <p class="text-zwlLightBlue text-xl uppercase tracking-[0.2em] font-bold mb-10 drop-shadow-sm">Omgevingsanalyse</p>
+            
+            <button onclick="dismissSplash()" class="bg-gradient-to-r from-zwlGreen to-[#8ab01c] text-zwlDarkBlue px-10 py-3.5 rounded-full font-extrabold hover:scale-105 transition-all shadow-[0_4px_20px_rgba(157,194,33,0.4)] flex items-center gap-3 mx-auto text-lg border border-[#a8cf26]">
+                Start Dashboard
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
 
     <!-- Custom Modal Overlay -->
     <div id="custom-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center">
@@ -1207,7 +1260,19 @@
         let activeFileHandle = null;
         let hasUnsavedChanges = false;
 
+        // Functie om het splash scherm te verbergen
+        function dismissSplash() {
+            const splash = document.getElementById('splash-screen');
+            if(splash) {
+                splash.classList.add('splash-hidden');
+                setTimeout(() => splash.remove(), 600);
+            }
+        }
+
         window.onload = function() {
+            // Laat het startscherm na 3.5 seconden automatisch weggaan
+            setTimeout(() => { dismissSplash(); }, 3500);
+
             loadData();
             if(issuesData.length === 0) {
                 issuesData = [
